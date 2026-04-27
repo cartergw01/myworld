@@ -2,14 +2,52 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, PlusCircle, Archive, User } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 const tabs = [
-  { href: '/home', label: 'Home', icon: Home },
-  { href: '/create', label: 'Create', icon: PlusCircle },
-  { href: '/archive', label: 'Archive', icon: Archive },
-  { href: '/profile', label: 'Profile', icon: User },
+  {
+    href: '/home',
+    label: 'home',
+    icon: (active: boolean) => (
+      <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
+        <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth={active ? 1.5 : 1.2} />
+        <circle cx="10" cy="10" r="2.5" fill="currentColor" opacity={active ? 0.9 : 0.5} />
+      </svg>
+    ),
+  },
+  {
+    href: '/create',
+    label: 'add',
+    icon: (active: boolean) => (
+      <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
+        <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth={active ? 1.5 : 1.2} />
+        <path d="M10 7v6M7 10h6" stroke="currentColor" strokeWidth={active ? 1.6 : 1.3} strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    href: '/archive',
+    label: 'archive',
+    icon: (active: boolean) => (
+      <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
+        <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth={active ? 1.4 : 1.1} />
+        <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth={active ? 1.2 : 0.9} strokeDasharray="2.5 2.5" />
+        <circle cx="10" cy="2.5" r="1.6" fill="currentColor" opacity={active ? 1 : 0.5} />
+        <circle cx="17" cy="13.5" r="1.4" fill="currentColor" opacity={active ? 0.8 : 0.35} />
+        <circle cx="3" cy="13.5" r="1.4" fill="currentColor" opacity={active ? 0.6 : 0.25} />
+      </svg>
+    ),
+  },
+  {
+    href: '/profile',
+    label: 'me',
+    icon: (active: boolean) => (
+      <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
+        <circle cx="10" cy="7.5" r="3" stroke="currentColor" strokeWidth={active ? 1.5 : 1.2} />
+        <path d="M3.5 18c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5"
+          stroke="currentColor" strokeWidth={active ? 1.5 : 1.2} strokeLinecap="round" />
+      </svg>
+    ),
+  },
 ]
 
 export function BottomNav() {
@@ -19,62 +57,32 @@ export function BottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50"
       style={{
-        background: 'rgba(10,10,10,0.92)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        background: 'rgba(4,6,16,0.94)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
         borderTop: '1px solid rgba(255,255,255,0.06)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
       <div className="flex items-stretch max-w-lg mx-auto">
-        {tabs.map(({ href, label, icon: Icon }) => {
+        {tabs.map(({ href, label, icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + '/')
-          const isCreate = href === '/create'
-
           return (
             <Link
               key={href}
               href={href}
-              className={cn(
-                'flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-all duration-200',
-                isCreate && 'relative',
-              )}
+              className="flex-1 flex flex-col items-center justify-center gap-1.5 py-3 transition-colors duration-200"
+              style={{ color: isActive ? 'rgba(240,235,225,0.85)' : 'rgba(255,255,255,0.22)' }}
             >
-              {isCreate ? (
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200"
-                  style={{
-                    background: isActive
-                      ? '#C8A882'
-                      : 'rgba(200,168,130,0.15)',
-                    border: '1px solid rgba(200,168,130,0.3)',
-                  }}
-                >
-                  <Icon
-                    size={22}
-                    style={{ color: isActive ? '#0A0A0A' : '#C8A882' }}
-                    strokeWidth={isActive ? 2.5 : 2}
-                  />
-                </div>
-              ) : (
-                <>
-                  <Icon
-                    size={22}
-                    style={{
-                      color: isActive ? '#C8A882' : 'rgba(255,255,255,0.35)',
-                    }}
-                    strokeWidth={isActive ? 2 : 1.5}
-                  />
-                  <span
-                    className="text-[10px] font-medium tracking-wide"
-                    style={{
-                      color: isActive ? '#C8A882' : 'rgba(255,255,255,0.3)',
-                    }}
-                  >
-                    {label}
-                  </span>
-                </>
-              )}
+              {icon(isActive)}
+              <span style={{
+                fontFamily: "'Space Mono',monospace",
+                fontSize: 8, letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: isActive ? 'rgba(240,235,225,0.6)' : 'rgba(255,255,255,0.18)',
+              }}>
+                {label}
+              </span>
             </Link>
           )
         })}

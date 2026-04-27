@@ -131,3 +131,41 @@
     padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* ── Animations ───────────────────────────────────── */
+@keyframes orbitGridSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes orbitFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orbitPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+
+/* ── Scroll-snap utilities ────────────────────────── */
+.snap-y-mandatory {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+}
+.snap-start {
+  scroll-snap-align: start;
+}
+
+/* ── Font utilities ───────────────────────────────── */
+.font-serif-orbit {
+  font-family: var(--font-serif, 'Instrument Serif', serif);
+}
+.font-mono-orbit {
+  font-family: var(--font-mono-orbit, 'Space Mono', monospace);
+}
+
+/* ── Cosmic background ────────────────────────────── */
+.bg-cosmic {
+  background: linear-gradient(160deg, #0b0820 0%, #06091a 50%, #03060e 100%);
+}
