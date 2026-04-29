@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useStore } from '@/lib/store'
-import { formatWeekShort, getCategoryColor, getCategoryDim } from '@/lib/utils'
+import { formatWeekShort, getCategoryColor, getCategoryDim, getWeekStartDate } from '@/lib/utils'
 import { CategoryGlyph } from '@/components/capsule/CategoryGlyph'
 import type { Pick as PickType, Capsule, User } from '@/types'
 
@@ -70,17 +70,15 @@ function StarField() {
 function PickSection({ pick, author, capsule, index, total }: { pick: PickType; author: User; capsule: Capsule; index: number; total: number }) {
   const color = getCategoryColor(pick.category)
   const dim   = getCategoryDim(pick.category)
-  const progressPercent = `${((index + 1) / total) * 100}%`
 
   return (
     <motion.section
-      className="orbit-feed-section"
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, margin: '-12%' }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        minHeight: 'calc(100svh - 80px)',
+        height: 'calc(100svh - 80px)',
         scrollSnapAlign: 'start',
         display: 'flex',
         flexDirection: 'column',
@@ -88,7 +86,7 @@ function PickSection({ pick, author, capsule, index, total }: { pick: PickType; 
         padding: '0 24px',
         position: 'relative',
         zIndex: 1,
-        maxWidth: 600,
+        maxWidth: 512,
         margin: '0 auto',
         width: '100%',
       }}
@@ -102,137 +100,102 @@ function PickSection({ pick, author, capsule, index, total }: { pick: PickType; 
         pointerEvents: 'none', zIndex: 0,
       }} />
 
-      <div className="orbit-feed-body" style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, marginBottom: 20 }}>
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        {/* Category + author row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color }}>
             <CategoryGlyph category={pick.category} size={13} />
             <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
               {pick.category}
             </span>
           </div>
-          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,235,225,0.26)' }}>
-            {index + 1} / {total}
-          </span>
+          <Link
+            href={author.id === 'user_carter' ? '/profile' : `/profile?person=${author.id}`}
+            style={{ textDecoration: 'none' }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={author.avatar} alt={author.name}
+              style={{ width: 24, height: 24, borderRadius: '50%', opacity: 0.7, border: '1px solid rgba(255,255,255,0.08)' }} />
+          </Link>
         </div>
 
-        <Link
-          className="orbit-author-link"
-          href={author.id === 'user_carter' ? '/profile' : `/profile?person=${author.id}`}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 11,
-            textDecoration: 'none',
-            marginBottom: 18,
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={author.avatar}
-            alt={author.name}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: '50%',
-              opacity: 0.9,
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          />
-          <div style={{ minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: "'Instrument Serif',serif", fontSize: 20, color: 'rgba(240,235,225,0.78)', lineHeight: 1 }}>
-                {author.name}
-              </span>
-              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(240,235,225,0.32)' }}>
-                {trustLabel(author)}
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 5, overflow: 'hidden' }}>
-              {(author.orbit ?? []).slice(0, 3).map(tag => (
-                <span key={tag} style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.58)' }}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </Link>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr auto',
-          gap: 14,
-          alignItems: 'end',
+        {/* Title */}
+        <h2 style={{
+          fontFamily: "'Instrument Serif',serif",
+          fontSize: pick.title.length > 32 ? 30 : 38,
+          lineHeight: 1.05,
+          color: '#F0EBE1',
+          letterSpacing: '-0.01em',
           marginBottom: pick.source ? 12 : 0,
         }}>
-          <div style={{ minWidth: 0 }}>
-            <h2 className="orbit-feed-title" style={{
-              fontFamily: "'Instrument Serif',serif",
-              fontSize: pick.title.length > 32 ? 34 : 42,
-              lineHeight: 1.05,
-              color: '#F0EBE1',
-              letterSpacing: '-0.01em',
-            }}>
-              {pick.title}
-            </h2>
-            {pick.source && (
-              <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 14, fontStyle: 'italic', color: 'rgba(240,235,225,0.42)', marginTop: 10 }}>
-                {pick.source}
-              </p>
-            )}
-          </div>
+          {pick.title}
+        </h2>
+
+        {/* Source */}
+        {pick.source && (
+          <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 14, fontStyle: 'italic', color: 'rgba(240,235,225,0.42)' }}>
+            {pick.source}
+          </p>
+        )}
+
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '18px 0' }} />
+
+        {/* Note */}
+        {pick.note && (
+          <p style={{
+            fontFamily: "'Instrument Serif',serif",
+            fontSize: 15, fontStyle: 'italic', lineHeight: 1.7,
+            color: 'rgba(240,235,225,0.48)',
+            marginBottom: 20,
+            display: '-webkit-box',
+            WebkitLineClamp: 5,
+            WebkitBoxOrient: 'vertical' as const,
+            overflow: 'hidden',
+          }}>
+            &ldquo;{pick.note}&rdquo;
+          </p>
+        )}
+
+        {/* Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          {['✦  resonate', '◎  save'].map((label, i) => (
+            <span key={i} style={{
+              fontFamily: "'Space Mono',monospace", fontSize: 9,
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.2)', cursor: 'default',
+            }}>{label}</span>
+          ))}
           {pick.url && (
-            <a href={pick.url} target="_blank" rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
-              style={{
-                fontFamily: "'Space Mono',monospace",
-                fontSize: 9,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: 'rgba(200,168,130,0.58)',
-                textDecoration: 'none',
-                borderBottom: '1px solid rgba(200,168,130,0.28)',
-                paddingBottom: 3,
-              }}>
-              open
-            </a>
+            <>
+              <div style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.1)' }} />
+              <a href={pick.url} target="_blank" rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                style={{
+                  fontFamily: "'Space Mono',monospace", fontSize: 9,
+                  letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.2)', textDecoration: 'none',
+                }}>
+                ↗  open
+              </a>
+            </>
           )}
-        </div>
-
-        <div className="orbit-context-grid" style={{
-          margin: '19px 0 18px',
-          paddingTop: 18,
-          borderTop: '1px solid rgba(255,255,255,0.07)',
-        }}>
-          {pick.note && (
-            <div>
-              <p className="orbit-feed-note" style={{
-                fontFamily: "'Instrument Serif',serif",
-                fontSize: 17,
-                fontStyle: 'italic',
-                lineHeight: 1.62,
-                color: 'rgba(240,235,225,0.58)',
-                display: '-webkit-box',
-                WebkitLineClamp: 5,
-                WebkitBoxOrient: 'vertical' as const,
-                overflow: 'hidden',
-              }}>
-                &ldquo;{pick.note}&rdquo;
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="orbit-week-mark" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
-            {formatWeekShort(capsule.weekStartDate)}
-          </span>
         </div>
       </div>
 
-      <div className="orbit-progress" aria-label={`Item ${index + 1} of ${total}`}>
-        <div className="orbit-progress-track">
-          <div style={{ width: progressPercent }} />
-        </div>
+      {/* Progress dots */}
+      <div style={{
+        position: 'absolute', bottom: 22, left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex', gap: 7, zIndex: 2,
+      }}>
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i} style={{
+            width: i === index ? 16 : 4, height: 4, borderRadius: 2,
+            background: i === index ? 'rgba(240,235,225,0.6)' : 'rgba(255,255,255,0.15)',
+            transition: 'width 0.3s ease',
+          }} />
+        ))}
       </div>
     </motion.section>
   )
@@ -357,10 +320,13 @@ export default function HomePage() {
       </div>
 
       {/* Top bar */}
-      <div style={{ padding: '56px 24px 16px', position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto' }}>
+      <div style={{ padding: '56px 24px 16px', position: 'relative', zIndex: 1, maxWidth: 512, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.22)' }}>
-            New from people you follow
+            orbit
+          </span>
+          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.18)' }}>
+            {formatWeekShort(getWeekStartDate())}
           </span>
           <Link href="/profile">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -385,12 +351,12 @@ export default function HomePage() {
           minHeight: 'calc(100svh - 80px)',
           position: 'relative', zIndex: 1,
           padding: '36px 24px 120px',
-          maxWidth: 600, margin: '0 auto',
+          maxWidth: 512, margin: '0 auto',
           width: '100%',
         }}>
           <div style={{ marginBottom: 22 }}>
             <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
-              recent shares
+              past weeks
             </span>
           </div>
           {pastCapsules.map((c, i) => (

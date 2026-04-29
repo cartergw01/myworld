@@ -16,7 +16,7 @@ const tabs = [
   },
   {
     href: '/create',
-    label: 'share',
+    label: 'add',
     icon: (active: boolean) => (
       <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
         <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth={active ? 1.5 : 1.2} />
@@ -25,14 +25,26 @@ const tabs = [
     ),
   },
   {
-    href: '/profile',
-    label: 'orbit',
+    href: '/archive',
+    label: 'archive',
     icon: (active: boolean) => (
       <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
-        <circle cx="10" cy="10" r="2.8" stroke="currentColor" strokeWidth={active ? 1.5 : 1.15} />
-        <circle cx="10" cy="10" r="7.4" stroke="currentColor" strokeDasharray="2.4 2.8" strokeWidth={active ? 1.25 : 0.95} />
-        <circle cx="10" cy="2.6" r="1.45" fill="currentColor" opacity={active ? 0.95 : 0.45} />
-        <circle cx="16.4" cy="13.7" r="1.25" fill="currentColor" opacity={active ? 0.75 : 0.28} />
+        <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth={active ? 1.4 : 1.1} />
+        <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth={active ? 1.2 : 0.9} strokeDasharray="2.5 2.5" />
+        <circle cx="10" cy="2.5" r="1.6" fill="currentColor" opacity={active ? 1 : 0.5} />
+        <circle cx="17" cy="13.5" r="1.4" fill="currentColor" opacity={active ? 0.8 : 0.35} />
+        <circle cx="3" cy="13.5" r="1.4" fill="currentColor" opacity={active ? 0.6 : 0.25} />
+      </svg>
+    ),
+  },
+  {
+    href: '/profile',
+    label: 'me',
+    icon: (active: boolean) => (
+      <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
+        <circle cx="10" cy="7.5" r="3" stroke="currentColor" strokeWidth={active ? 1.5 : 1.2} />
+        <path d="M3.5 18c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5"
+          stroke="currentColor" strokeWidth={active ? 1.5 : 1.2} strokeLinecap="round" />
       </svg>
     ),
   },
