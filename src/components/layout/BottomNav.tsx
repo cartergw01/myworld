@@ -25,19 +25,6 @@ const tabs = [
     ),
   },
   {
-    href: '/archive',
-    label: 'archive',
-    icon: (active: boolean) => (
-      <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
-        <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth={active ? 1.4 : 1.1} />
-        <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth={active ? 1.2 : 0.9} strokeDasharray="2.5 2.5" />
-        <circle cx="10" cy="2.5" r="1.6" fill="currentColor" opacity={active ? 1 : 0.5} />
-        <circle cx="17" cy="13.5" r="1.4" fill="currentColor" opacity={active ? 0.8 : 0.35} />
-        <circle cx="3" cy="13.5" r="1.4" fill="currentColor" opacity={active ? 0.6 : 0.25} />
-      </svg>
-    ),
-  },
-  {
     href: '/profile',
     label: 'me',
     icon: (active: boolean) => (
