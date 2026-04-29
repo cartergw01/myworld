@@ -319,21 +319,51 @@ export default function HomePage() {
         <PolarGrid />
       </div>
 
-      {/* Top bar */}
-      <div style={{ padding: '56px 24px 16px', position: 'relative', zIndex: 1, maxWidth: 512, margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Top bar + scroll hint */}
+      <div style={{
+        height: '100svh',
+        scrollSnapAlign: 'start',
+        position: 'relative', zIndex: 1,
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '56px 24px 48px',
+        maxWidth: 512, margin: '0 auto',
+        pointerEvents: 'none',
+      }}>
+        {/* Nav row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'auto' }}>
           <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.22)' }}>
             orbit
           </span>
           <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.18)' }}>
             {formatWeekShort(getWeekStartDate())}
           </span>
-          <Link href="/profile">
+          <Link href="/profile" style={{ pointerEvents: 'auto' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={currentUser.avatar} alt={currentUser.name}
               style={{ width: 26, height: 26, borderRadius: '50%', opacity: 0.8 }} />
           </Link>
         </div>
+
+        {/* Scroll hint */}
+        {feedItems.length > 0 && (
+          <div style={{ textAlign: 'center' }}>
+            <p style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: 18, fontStyle: 'italic',
+              color: 'rgba(240,235,225,0.22)',
+              marginBottom: 16, lineHeight: 1.4,
+            }}>
+              {feedItems.length} thing{feedItems.length !== 1 ? 's' : ''} from your orbit this week
+            </p>
+            <svg
+              viewBox="0 0 24 24" width={16} height={16} fill="none"
+              style={{ animation: 'orbitFadeUp 1.8s ease-in-out infinite alternate', opacity: 0.3 }}
+            >
+              <path d="M12 5v14M5 12l7 7 7-7" stroke="rgba(240,235,225,0.8)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* Trusted feed or empty state */}
