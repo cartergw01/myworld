@@ -1,32 +1,31 @@
 import Link from 'next/link'
 import { ProductPreview } from '@/components/landing/ProductPreview'
+import { CosmicBackdrop } from '@/components/layout/CosmicBackdrop'
 
 export default function LandingPage() {
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: '#0A0A0A' }}
-    >
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-cosmic">
+      <CosmicBackdrop density="dense" />
       {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-5">
+      <nav className="relative z-10 flex items-center justify-between px-6 py-5">
         <span
-          className="text-lg font-semibold tracking-tight"
+          className="font-mono-orbit text-[10px] font-bold uppercase tracking-[0.2em]"
           style={{ color: '#F0EBE1' }}
         >
           Orbit
         </span>
         <Link
           href="/auth"
-          className="text-sm font-medium transition-opacity hover:opacity-70"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
+          className="font-mono-orbit text-[9px] uppercase tracking-[0.16em] transition-opacity hover:opacity-70"
+          style={{ color: 'rgba(255,255,255,0.32)' }}
         >
           Sign in
         </Link>
       </nav>
 
       {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 pt-8 pb-16">
-        <div className="max-w-md w-full text-center">
+      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pb-16 pt-8">
+        <div className="w-full max-w-md text-center">
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 mb-6">
             <div
@@ -37,13 +36,13 @@ export default function LandingPage() {
               className="text-xs font-medium tracking-widest uppercase"
               style={{ color: 'rgba(200,168,130,0.7)' }}
             >
-              Weekly ritual
+              Shared weekly
             </span>
           </div>
 
           {/* Headline */}
           <h1
-            className="text-[2.2rem] font-semibold leading-[1.1] tracking-tight mb-4"
+            className="font-serif-orbit mb-4 text-[3rem] leading-[0.98]"
             style={{ color: '#F0EBE1' }}
           >
             Share the best things that shaped your week.
@@ -51,17 +50,17 @@ export default function LandingPage() {
 
           {/* Subheadline */}
           <p
-            className="text-base leading-relaxed mb-8 max-w-sm mx-auto"
-            style={{ color: '#6B6B6B' }}
+            className="font-serif-orbit mx-auto mb-8 max-w-sm text-lg italic leading-relaxed"
+            style={{ color: 'rgba(240,235,225,0.46)' }}
           >
-            Orbit is a weekly ritual for tracking what you read, watched, heard, and couldn't stop thinking about.
+            Orbit helps you keep track of what you read, watched, heard, and could not stop thinking about.
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col gap-3 w-full max-w-xs mx-auto mb-12">
             <Link
               href="/auth"
-              className="w-full py-4 rounded-2xl text-sm font-semibold text-center transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+              className="font-mono-orbit w-full rounded-[6px] py-4 text-center text-[10px] font-bold uppercase tracking-[0.14em] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
               style={{
                 background: '#C8A882',
                 color: '#0A0A0A',
@@ -71,14 +70,14 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/home"
-              className="w-full py-4 rounded-2xl text-sm font-medium text-center transition-all duration-200"
+              className="font-mono-orbit w-full rounded-[6px] py-4 text-center text-[10px] uppercase tracking-[0.14em] transition-all duration-200"
               style={{
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.08)',
                 color: 'rgba(255,255,255,0.5)',
               }}
             >
-              Preview the app →
+              Preview the app
             </Link>
           </div>
 
@@ -95,10 +94,10 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer
-        className="py-6 px-6 text-center text-xs"
+        className="font-mono-orbit relative z-10 px-6 py-6 text-center text-[9px] uppercase tracking-[0.18em]"
         style={{ color: 'rgba(255,255,255,0.15)', borderTop: '1px solid rgba(255,255,255,0.04)' }}
       >
-        Orbit — taste over volume
+        Orbit / attention over volume
       </footer>
     </div>
   )

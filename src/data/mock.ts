@@ -6,9 +6,88 @@ export const currentUser: User = {
   username: 'cartergw',
   bio: 'Building things. Paying attention.',
   avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Carter&backgroundColor=1C1C1C&textColor=C8A882',
+  relationshipStrength: 1,
+  orbit: ['Products', 'AI', 'Taste', 'Media'],
 }
 
+export const mockUsers: User[] = [
+  currentUser,
+  {
+    id: 'user_maya',
+    name: 'Maya',
+    username: 'mayathinks',
+    bio: 'Reading infrastructure, cities, and the quiet parts of technology.',
+    avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Maya&backgroundColor=111827&textColor=7BB3FF',
+    relationshipStrength: 0.92,
+    orbit: ['Cities', 'Infrastructure', 'Books'],
+  },
+  {
+    id: 'user_jules',
+    name: 'Jules',
+    username: 'julesnotes',
+    bio: 'Collecting films, essays, strange interfaces, and better questions.',
+    avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=Jules&backgroundColor=1f1a2e&textColor=B07BFF',
+    relationshipStrength: 0.78,
+    orbit: ['Film', 'Interfaces', 'Questions'],
+  },
+]
+
 export const mockCapsules: Capsule[] = [
+  {
+    id: 'capsule_maya_apr21',
+    userId: 'user_maya',
+    weekStartDate: '2026-04-21',
+    publishedAt: '2026-04-26T09:15:00Z',
+    status: 'published',
+    picks: [
+      {
+        id: 'pick_maya_1a',
+        capsuleId: 'capsule_maya_apr21',
+        category: 'Read',
+        title: 'The Maintenance of Everything',
+        source: 'Works in Progress',
+        url: 'https://worksinprogress.co',
+        note: 'Most progress depends on people keeping old systems legible. The essay made maintenance feel like imagination, not bureaucracy.',
+        order: 0,
+      },
+      {
+        id: 'pick_maya_1b',
+        capsuleId: 'capsule_maya_apr21',
+        category: 'Idea',
+        title: 'Cities reveal their values in their defaults',
+        source: 'Field note',
+        note: 'A curb cut, a bench, a missing sidewalk. None of these feel ideological until you start counting who they serve.',
+        order: 1,
+      },
+    ],
+  },
+  {
+    id: 'capsule_jules_apr21',
+    userId: 'user_jules',
+    weekStartDate: '2026-04-21',
+    publishedAt: '2026-04-25T18:40:00Z',
+    status: 'published',
+    picks: [
+      {
+        id: 'pick_jules_1a',
+        capsuleId: 'capsule_jules_apr21',
+        category: 'Watch',
+        title: 'Perfect Days',
+        source: 'Wim Wenders',
+        note: 'A movie about routine that never mistakes quiet for emptiness. Every small repetition accumulates meaning.',
+        order: 0,
+      },
+      {
+        id: 'pick_jules_1b',
+        capsuleId: 'capsule_jules_apr21',
+        category: 'Other',
+        title: 'A website that only changes at midnight',
+        source: 'Internet artifact',
+        note: 'Useful reminder that not every interface needs to be live, reactive, and hungry. Some things should make you wait.',
+        order: 1,
+      },
+    ],
+  },
   {
     id: 'capsule_apr14',
     userId: 'user_carter',
@@ -61,7 +140,7 @@ export const mockCapsules: Capsule[] = [
       {
         id: 'pick_1e',
         capsuleId: 'capsule_apr14',
-        category: 'Wild Card',
+        category: 'Other',
         title: 'The Rabbit R1 postmortem nobody wrote',
         source: 'The Verge',
         url: 'https://www.theverge.com',
@@ -173,7 +252,7 @@ export const mockCapsules: Capsule[] = [
       {
         id: 'pick_3e',
         capsuleId: 'capsule_mar31',
-        category: 'Wild Card',
+        category: 'Other',
         title: 'Every Noise at Once',
         source: 'Glenn McDonald / Spotify',
         url: 'https://everynoise.com',

@@ -12,7 +12,9 @@ export default function CapsulePage({ params }: { params: Promise<{ id: string }
   if (!capsule) {
     return (
       <div className="min-h-screen flex items-center justify-center pb-safe">
-        <p style={{ color: '#3A3A3A' }}>Capsule not found.</p>
+        <p className="font-serif-orbit text-lg italic" style={{ color: 'rgba(240,235,225,0.32)' }}>
+          This share could not be found.
+        </p>
       </div>
     )
   }

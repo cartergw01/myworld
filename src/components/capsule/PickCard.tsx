@@ -3,47 +3,11 @@
 import { motion } from 'framer-motion'
 import type { Pick } from '@/types'
 import { getCategoryColor, getCategoryDim } from '@/lib/utils'
+import { CategoryGlyph } from './CategoryGlyph'
 
 interface PickCardProps {
   pick: Pick
   index?: number
-}
-
-function CategoryIcon({ category, size = 13 }: { category: string; size?: number }) {
-  const s = { width: size, height: size }
-  if (category === 'Read') return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <path d="M2 3a1 1 0 011-1h4.5v10H3a1 1 0 01-1-1V3z" stroke="currentColor" strokeWidth="1.3"/>
-      <path d="M7.5 2H11a1 1 0 011 1v8a1 1 0 01-1 1H7.5V2z" stroke="currentColor" strokeWidth="1.3"/>
-      <path d="M4.5 6h2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-    </svg>
-  )
-  if (category === 'Watch') return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <circle cx="7" cy="7" r="5.3" stroke="currentColor" strokeWidth="1.3"/>
-      <path d="M5.5 5.2l4 1.8-4 1.8V5.2z" fill="currentColor" opacity="0.75"/>
-    </svg>
-  )
-  if (category === 'Listen') return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <path d="M9.5 2.5v7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-      <path d="M9.5 2.5L5.5 4v7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="4" cy="11" r="1.5" stroke="currentColor" strokeWidth="1.3"/>
-      <circle cx="8" cy="10" r="1.5" stroke="currentColor" strokeWidth="1.3"/>
-    </svg>
-  )
-  if (category === 'Idea') return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <path d="M3 3.5A.5.5 0 013.5 3h7a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H7.5L5 11V9H3.5a.5.5 0 01-.5-.5v-5z"
-        stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
-    </svg>
-  )
-  return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <path d="M7 2l1.2 3.5H12l-3 2.1 1.2 3.5L7 9.1 3.8 11.1 5 7.6 2 5.5h3.8z"
-        stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
-    </svg>
-  )
 }
 
 export function PickCard({ pick, index = 0 }: PickCardProps) {
@@ -83,7 +47,7 @@ export function PickCard({ pick, index = 0 }: PickCardProps) {
 
         {/* Category */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 14, color }}>
-          <CategoryIcon category={pick.category} />
+          <CategoryGlyph category={pick.category} size={13} />
           <span style={{
             fontFamily: "'Space Mono',monospace",
             fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase',
@@ -137,29 +101,16 @@ export function PickCard({ pick, index = 0 }: PickCardProps) {
             </p>
           )}
 
-          {/* Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            {['✦  resonate', '◎  save'].map((label, i) => (
-              <span key={i} style={{
+          {pick.url && (
+            <a href={pick.url} target="_blank" rel="noopener noreferrer"
+              style={{
                 fontFamily: "'Space Mono',monospace", fontSize: 9,
                 letterSpacing: '0.14em', textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.2)', cursor: 'default',
-              }}>{label}</span>
-            ))}
-            {pick.url && (
-              <>
-                <div style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.1)' }} />
-                <a href={pick.url} target="_blank" rel="noopener noreferrer"
-                  style={{
-                    fontFamily: "'Space Mono',monospace", fontSize: 9,
-                    letterSpacing: '0.14em', textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.2)', textDecoration: 'none',
-                  }}>
-                  ↗&nbsp;&nbsp;open
-                </a>
-              </>
-            )}
-          </div>
+                color: 'rgba(255,255,255,0.2)', textDecoration: 'none',
+              }}>
+              ↗&nbsp;&nbsp;open
+            </a>
+          )}
         </div>
       </div>
     </motion.div>

@@ -3,58 +3,12 @@
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import type { Capsule } from '@/types'
+import { CosmicBackdrop } from '@/components/layout/CosmicBackdrop'
 import { PickCard } from './PickCard'
 import { formatWeekLabel, formatWeekShort, getCategoryColor } from '@/lib/utils'
 
 interface CapsuleDetailProps {
   capsule: Capsule
-}
-
-function PolarGrid() {
-  const rings = [55, 105, 160, 220]
-  const radials = Array.from({ length: 12 }, (_, i) => i * 30)
-  return (
-    <svg
-      style={{
-        position: 'fixed', inset: 0, width: '100%', height: '100%',
-        zIndex: 0, pointerEvents: 'none', opacity: 0.28,
-        animation: 'orbitGridSpin 120s linear infinite',
-        transformOrigin: '50% 30%',
-      }}
-      viewBox="0 0 375 700" preserveAspectRatio="xMidYMid slice"
-    >
-      {rings.map(r => (
-        <circle key={r} cx={187} cy={210} r={r}
-          fill="none" stroke="rgba(60,100,220,0.3)" strokeWidth="0.6"
-          strokeDasharray={r > 130 ? '3 8' : '2 6'} />
-      ))}
-      {radials.map(a => {
-        const rad = a * Math.PI / 180
-        return (
-          <line key={a} x1={187} y1={210}
-            x2={187 + Math.cos(rad) * 250} y2={210 + Math.sin(rad) * 250}
-            stroke="rgba(60,100,220,0.1)" strokeWidth="0.5" />
-        )
-      })}
-    </svg>
-  )
-}
-
-function StarField() {
-  const stars = Array.from({ length: 40 }, (_, i) => ({
-    cx: ((i * 137.508 + 23) % 369) + 3,
-    cy: ((i * 97.301 + 41) % 700) + 4,
-    r:  (i % 5) * 0.18 + 0.1,
-    o:  (i % 8) * 0.022 + 0.05,
-  }))
-  return (
-    <svg style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}
-      viewBox="0 0 375 700" preserveAspectRatio="xMidYMid slice">
-      {stars.map((s, i) => (
-        <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={`rgba(200,210,255,${s.o})`} />
-      ))}
-    </svg>
-  )
 }
 
 export function CapsuleDetail({ capsule }: CapsuleDetailProps) {
@@ -67,8 +21,7 @@ export function CapsuleDetail({ capsule }: CapsuleDetailProps) {
       background: 'linear-gradient(160deg,#0b0820 0%,#06091a 50%,#03060e 100%)',
       position: 'relative',
     }}>
-      <StarField />
-      <PolarGrid />
+      <CosmicBackdrop density="dense" />
 
       {/* Sticky header */}
       <div style={{
@@ -81,6 +34,7 @@ export function CapsuleDetail({ capsule }: CapsuleDetailProps) {
       }}>
         <div style={{ maxWidth: 512, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>
           <button
+            type="button"
             onClick={() => router.back()}
             style={{
               width: 28, height: 28, display: 'flex', alignItems: 'center',
@@ -136,10 +90,10 @@ export function CapsuleDetail({ capsule }: CapsuleDetailProps) {
           fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.2)',
         }}>
-          {sorted.length} picks
+          {sorted.length} items
           {capsule.publishedAt && (
             <span style={{ marginLeft: 12 }}>
-              · published {new Date(capsule.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              · shared {new Date(capsule.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           )}
         </div>
@@ -152,7 +106,7 @@ export function CapsuleDetail({ capsule }: CapsuleDetailProps) {
         position: 'relative', zIndex: 1,
       }} />
 
-      {/* Picks */}
+      {/* Items */}
       <div style={{
         padding: '8px 24px 120px',
         maxWidth: 512, margin: '0 auto',

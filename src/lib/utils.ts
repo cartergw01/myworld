@@ -32,7 +32,7 @@ export function getCategoryColor(category: Category): string {
     'Watch': '#FF8A7B',
     'Listen': '#B07BFF',
     'Idea': '#7BFFB3',
-    'Wild Card': '#FFD07B',
+    'Other': '#FFD07B',
   }
   return colors[category]
 }
@@ -43,18 +43,7 @@ export function getCategoryDim(category: Category): string {
     'Watch': 'rgba(255,138,123,0.1)',
     'Listen': 'rgba(176,123,255,0.1)',
     'Idea': 'rgba(123,255,179,0.1)',
-    'Wild Card': 'rgba(255,208,123,0.1)',
+    'Other': 'rgba(255,208,123,0.1)',
   }
   return colors[category]
-}
-
-export function getCategoryIcon(category: Category): string {
-  const icons: Record<Category, string> = {
-    'Read': '📖',
-    'Watch': '🎬',
-    'Listen': '🎧',
-    'Idea': '💡',
-    'Wild Card': '✦',
-  }
-  return icons[category]
 }

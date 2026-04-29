@@ -91,9 +91,16 @@
     @apply bg-background text-foreground;
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   html {
     @apply font-sans;
+  }
+  a,
+  button,
+  input,
+  textarea {
+    touch-action: manipulation;
   }
 }
 
@@ -148,6 +155,29 @@
   50%       { opacity: 1; }
 }
 
+@keyframes cometSweep {
+  0%, 54% { transform: translateX(-130%) rotate(8deg); opacity: 0; }
+  62%     { opacity: 0.42; }
+  86%     { opacity: 0; }
+  100%    { transform: translateX(130%) rotate(8deg); opacity: 0; }
+}
+
+@keyframes quietStarRise {
+  from { transform: translateY(5px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ── Scroll-snap utilities ────────────────────────── */
 .snap-y-mandatory {
   scroll-snap-type: y mandatory;
@@ -168,4 +198,224 @@
 /* ── Cosmic background ────────────────────────────── */
 .bg-cosmic {
   background: linear-gradient(160deg, #0b0820 0%, #06091a 50%, #03060e 100%);
+}
+
+/* ── Adaptive app surfaces ────────────────────────── */
+.orbit-feed-section {
+  height: auto;
+}
+
+.orbit-feed-body {
+  width: 100%;
+}
+
+.orbit-progress {
+  position: absolute;
+  bottom: 22px;
+  left: 24px;
+  right: 24px;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.orbit-progress-track {
+  width: min(220px, 42vw);
+  height: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.orbit-progress-track > div {
+  height: 100%;
+  background: rgba(240, 235, 225, 0.62);
+  box-shadow: 0 0 18px rgba(200, 168, 130, 0.35);
+  transition: width 240ms ease;
+}
+
+.orbit-author-link img {
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.orbit-author-link:active img,
+.orbit-author-link:hover img {
+  border-color: rgba(200, 168, 130, 0.34) !important;
+  box-shadow: 0 0 22px rgba(200, 168, 130, 0.12);
+  transform: translateY(-1px);
+}
+
+.orbit-week-mark::before {
+  content: "";
+  width: 3px;
+  height: 3px;
+  margin-right: 8px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: rgba(200, 168, 130, 0.42);
+  box-shadow: 0 0 14px rgba(200, 168, 130, 0.45);
+}
+
+.share-shell {
+  overscroll-behavior: contain;
+}
+
+.share-form-body {
+  min-height: 0;
+}
+
+.share-category {
+  position: relative;
+}
+
+.share-category svg {
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.share-category[data-active="true"] svg {
+  filter: drop-shadow(0 0 9px currentColor);
+  transform: scale(1.08);
+}
+
+.share-category[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.share-submit {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.share-submit > span {
+  position: relative;
+  z-index: 1;
+}
+
+.share-submit[data-ready="true"] {
+  box-shadow: 0 0 28px rgba(200, 168, 130, 0.16);
+}
+
+.share-submit[data-ready="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -60% -40%;
+  z-index: 0;
+  background: linear-gradient(100deg, transparent 38%, rgba(255, 255, 255, 0.34) 50%, transparent 62%);
+  animation: cometSweep 3.4s ease-in-out infinite;
+}
+
+.share-success-note {
+  animation: quietStarRise 260ms ease-out both;
+}
+
+@media (max-width: 430px), (max-height: 760px) {
+  .orbit-feed-section {
+    justify-content: center !important;
+    padding-inline: 20px !important;
+    padding-bottom: 74px !important;
+  }
+
+  .orbit-feed-title {
+    font-size: clamp(2rem, 10.5vw, 2.45rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  .orbit-feed-note {
+    font-size: 1rem !important;
+    line-height: 1.54 !important;
+    -webkit-line-clamp: 4 !important;
+  }
+
+  .orbit-progress {
+    bottom: 18px;
+  }
+
+  .orbit-progress-track {
+    width: min(168px, 50vw);
+  }
+
+  .share-content {
+    padding-top: 4.75rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .share-title {
+    font-size: 2.08rem !important;
+  }
+
+  .share-input-title {
+    font-size: 2rem !important;
+  }
+
+  .profile-hero {
+    min-height: min(360px, calc(100svh - 270px)) !important;
+  }
+
+  .profile-ring-large {
+    width: 15rem !important;
+    height: 15rem !important;
+  }
+
+  .profile-ring-small {
+    width: 10.5rem !important;
+    height: 10.5rem !important;
+  }
+
+  .profile-name {
+    font-size: 2.3rem !important;
+  }
+}
+
+@media (max-width: 360px), (max-height: 690px) {
+  .orbit-feed-section {
+    padding-inline: 18px !important;
+  }
+
+  .orbit-feed-title {
+    font-size: clamp(1.86rem, 10vw, 2.16rem) !important;
+  }
+
+  .orbit-feed-note {
+    -webkit-line-clamp: 3 !important;
+  }
+
+  .share-content {
+    padding-top: 3.6rem !important;
+  }
+
+  .share-title {
+    font-size: 1.84rem !important;
+  }
+
+  .share-actions {
+    position: sticky;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    padding-top: 10px;
+    background: linear-gradient(to top, rgba(5, 7, 18, 0.96), rgba(5, 7, 18, 0));
+  }
+
+  .profile-hero {
+    min-height: 300px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .orbit-feed-section {
+    justify-content: flex-start !important;
+    padding-top: 24px !important;
+    padding-bottom: 88px !important;
+  }
+
+  .share-content {
+    padding-top: 2.4rem !important;
+  }
 }

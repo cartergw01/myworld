@@ -3,8 +3,17 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useStore } from '@/lib/store'
-import { getWeekStartDate, formatWeekShort, getCategoryColor, getCategoryDim } from '@/lib/utils'
-import type { Pick as PickType, Capsule } from '@/types'
+import { formatWeekShort, getCategoryColor, getCategoryDim } from '@/lib/utils'
+import { CategoryGlyph } from '@/components/capsule/CategoryGlyph'
+import type { Pick as PickType, Capsule, User } from '@/types'
+
+function trustLabel(author: User) {
+  const strength = author.relationshipStrength ?? 0.5
+  if (author.id === 'user_carter') return 'you'
+  if (strength >= 0.9) return 'close friend'
+  if (strength >= 0.7) return 'trusted source'
+  return 'following'
+}
 
 // ─── Polar HUD Grid ─────────────────────────────────
 function PolarGrid() {
@@ -24,10 +33,12 @@ function PolarGrid() {
       ))}
       {radials.map(a => {
         const rad = a * Math.PI / 180
+        const x2 = Number((187 + Math.cos(rad) * 300).toFixed(3))
+        const y2 = Number((210 + Math.sin(rad) * 300).toFixed(3))
         return (
           <line key={a}
             x1={187} y1={210}
-            x2={187 + Math.cos(rad) * 300} y2={210 + Math.sin(rad) * 300}
+            x2={x2} y2={y2}
             stroke="rgba(60,100,220,0.12)" strokeWidth="0.5" />
         )
       })}
@@ -55,57 +66,21 @@ function StarField() {
   )
 }
 
-// ─── Category SVG icons ──────────────────────────────
-function CategoryIcon({ category, size = 13 }: { category: string; size?: number }) {
-  const s = { width: size, height: size }
-  if (category === 'Read') return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <path d="M2 3a1 1 0 011-1h4.5v10H3a1 1 0 01-1-1V3z" stroke="currentColor" strokeWidth="1.3"/>
-      <path d="M7.5 2H11a1 1 0 011 1v8a1 1 0 01-1 1H7.5V2z" stroke="currentColor" strokeWidth="1.3"/>
-      <path d="M4.5 6h2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-    </svg>
-  )
-  if (category === 'Watch') return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <circle cx="7" cy="7" r="5.3" stroke="currentColor" strokeWidth="1.3"/>
-      <path d="M5.5 5.2l4 1.8-4 1.8V5.2z" fill="currentColor" opacity="0.75"/>
-    </svg>
-  )
-  if (category === 'Listen') return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <path d="M9.5 2.5v7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-      <path d="M9.5 2.5L5.5 4v7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="4" cy="11" r="1.5" stroke="currentColor" strokeWidth="1.3"/>
-      <circle cx="8" cy="10" r="1.5" stroke="currentColor" strokeWidth="1.3"/>
-    </svg>
-  )
-  if (category === 'Idea') return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <path d="M3 3.5A.5.5 0 013.5 3h7a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H7.5L5 11V9H3.5a.5.5 0 01-.5-.5v-5z"
-        stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
-    </svg>
-  )
-  return (
-    <svg viewBox="0 0 14 14" {...s} fill="none">
-      <path d="M7 2l1.2 3.5H12l-3 2.1 1.2 3.5L7 9.1 3.8 11.1 5 7.6 2 5.5h3.8z"
-        stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
-    </svg>
-  )
-}
-
 // ─── Single pick — full-screen snap section ──────────
-function PickSection({ pick, index, total }: { pick: PickType; index: number; total: number }) {
+function PickSection({ pick, author, capsule, index, total }: { pick: PickType; author: User; capsule: Capsule; index: number; total: number }) {
   const color = getCategoryColor(pick.category)
   const dim   = getCategoryDim(pick.category)
+  const progressPercent = `${((index + 1) / total) * 100}%`
 
   return (
     <motion.section
+      className="orbit-feed-section"
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, margin: '-12%' }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        height: 'calc(100svh - 80px)',
+        minHeight: 'calc(100svh - 80px)',
         scrollSnapAlign: 'start',
         display: 'flex',
         flexDirection: 'column',
@@ -113,7 +88,7 @@ function PickSection({ pick, index, total }: { pick: PickType; index: number; to
         padding: '0 24px',
         position: 'relative',
         zIndex: 1,
-        maxWidth: 512,
+        maxWidth: 600,
         margin: '0 auto',
         width: '100%',
       }}
@@ -127,92 +102,137 @@ function PickSection({ pick, index, total }: { pick: PickType; index: number; to
         pointerEvents: 'none', zIndex: 0,
       }} />
 
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* Category */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 22, color }}>
-          <CategoryIcon category={pick.category} />
-          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-            {pick.category}
+      <div className="orbit-feed-body" style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color }}>
+            <CategoryGlyph category={pick.category} size={13} />
+            <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+              {pick.category}
+            </span>
+          </div>
+          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,235,225,0.26)' }}>
+            {index + 1} / {total}
           </span>
         </div>
 
-        {/* Title */}
-        <h2 style={{
-          fontFamily: "'Instrument Serif',serif",
-          fontSize: pick.title.length > 32 ? 30 : 38,
-          lineHeight: 1.05,
-          color: '#F0EBE1',
-          letterSpacing: '-0.01em',
+        <Link
+          className="orbit-author-link"
+          href={author.id === 'user_carter' ? '/profile' : `/profile?person=${author.id}`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 11,
+            textDecoration: 'none',
+            marginBottom: 18,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={author.avatar}
+            alt={author.name}
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: '50%',
+              opacity: 0.9,
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: "'Instrument Serif',serif", fontSize: 20, color: 'rgba(240,235,225,0.78)', lineHeight: 1 }}>
+                {author.name}
+              </span>
+              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(240,235,225,0.32)' }}>
+                {trustLabel(author)}
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 5, overflow: 'hidden' }}>
+              {(author.orbit ?? []).slice(0, 3).map(tag => (
+                <span key={tag} style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.58)' }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Link>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          gap: 14,
+          alignItems: 'end',
           marginBottom: pick.source ? 12 : 0,
         }}>
-          {pick.title}
-        </h2>
-
-        {/* Source */}
-        {pick.source && (
-          <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 14, fontStyle: 'italic', color: 'rgba(240,235,225,0.42)' }}>
-            {pick.source}
-          </p>
-        )}
-
-        {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '18px 0' }} />
-
-        {/* Note */}
-        {pick.note && (
-          <p style={{
-            fontFamily: "'Instrument Serif',serif",
-            fontSize: 15, fontStyle: 'italic', lineHeight: 1.7,
-            color: 'rgba(240,235,225,0.48)',
-            marginBottom: 20,
-            display: '-webkit-box',
-            WebkitLineClamp: 5,
-            WebkitBoxOrient: 'vertical' as const,
-            overflow: 'hidden',
-          }}>
-            &ldquo;{pick.note}&rdquo;
-          </p>
-        )}
-
-        {/* Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-          {['✦  resonate', '◎  save'].map((label, i) => (
-            <span key={i} style={{
-              fontFamily: "'Space Mono',monospace", fontSize: 9,
-              letterSpacing: '0.14em', textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.2)', cursor: 'default',
-            }}>{label}</span>
-          ))}
+          <div style={{ minWidth: 0 }}>
+            <h2 className="orbit-feed-title" style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: pick.title.length > 32 ? 34 : 42,
+              lineHeight: 1.05,
+              color: '#F0EBE1',
+              letterSpacing: '-0.01em',
+            }}>
+              {pick.title}
+            </h2>
+            {pick.source && (
+              <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 14, fontStyle: 'italic', color: 'rgba(240,235,225,0.42)', marginTop: 10 }}>
+                {pick.source}
+              </p>
+            )}
+          </div>
           {pick.url && (
-            <>
-              <div style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.1)' }} />
-              <a href={pick.url} target="_blank" rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                style={{
-                  fontFamily: "'Space Mono',monospace", fontSize: 9,
-                  letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.2)', textDecoration: 'none',
-                }}>
-                ↗  open
-              </a>
-            </>
+            <a href={pick.url} target="_blank" rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                fontFamily: "'Space Mono',monospace",
+                fontSize: 9,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'rgba(200,168,130,0.58)',
+                textDecoration: 'none',
+                borderBottom: '1px solid rgba(200,168,130,0.28)',
+                paddingBottom: 3,
+              }}>
+              open
+            </a>
           )}
+        </div>
+
+        <div className="orbit-context-grid" style={{
+          margin: '19px 0 18px',
+          paddingTop: 18,
+          borderTop: '1px solid rgba(255,255,255,0.07)',
+        }}>
+          {pick.note && (
+            <div>
+              <p className="orbit-feed-note" style={{
+                fontFamily: "'Instrument Serif',serif",
+                fontSize: 17,
+                fontStyle: 'italic',
+                lineHeight: 1.62,
+                color: 'rgba(240,235,225,0.58)',
+                display: '-webkit-box',
+                WebkitLineClamp: 5,
+                WebkitBoxOrient: 'vertical' as const,
+                overflow: 'hidden',
+              }}>
+                &ldquo;{pick.note}&rdquo;
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="orbit-week-mark" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
+            {formatWeekShort(capsule.weekStartDate)}
+          </span>
         </div>
       </div>
 
-      {/* Progress dots */}
-      <div style={{
-        position: 'absolute', bottom: 22, left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex', gap: 7, zIndex: 2,
-      }}>
-        {Array.from({ length: total }).map((_, i) => (
-          <div key={i} style={{
-            width: i === index ? 16 : 4, height: 4, borderRadius: 2,
-            background: i === index ? 'rgba(240,235,225,0.6)' : 'rgba(255,255,255,0.15)',
-            transition: 'width 0.3s ease',
-          }} />
-        ))}
+      <div className="orbit-progress" aria-label={`Item ${index + 1} of ${total}`}>
+        <div className="orbit-progress-track">
+          <div style={{ width: progressPercent }} />
+        </div>
       </div>
     </motion.section>
   )
@@ -234,7 +254,7 @@ function EmptyState() {
           fontSize: 30, fontStyle: 'italic',
           color: 'rgba(240,235,225,0.28)', lineHeight: 1.3, marginBottom: 28,
         }}>
-          What has your mind<br />been orbiting?
+          No one has shared yet.<br />Start with yours.
         </p>
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -245,14 +265,14 @@ function EmptyState() {
           fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase',
           color: 'rgba(240,235,225,0.35)',
         }}>
-          ✦&nbsp;&nbsp;start this week
+          ✦&nbsp;&nbsp;share something
         </div>
       </Link>
     </section>
   )
 }
 
-// ─── Past capsule row ────────────────────────────────
+// ─── Past row ────────────────────────────────────────
 function PastCapsuleRow({ capsule, index }: { capsule: Capsule; index: number }) {
   return (
     <motion.div
@@ -298,20 +318,29 @@ function PastCapsuleRow({ capsule, index }: { capsule: Capsule; index: number })
 
 // ─── Page ────────────────────────────────────────────
 export default function HomePage() {
-  const { currentUser, capsules } = useStore()
+  const { currentUser, users, capsules, getUserById } = useStore()
 
-  const thisWeek = getWeekStartDate()
-  const thisWeekCapsule = capsules.find(
-    c => c.weekStartDate === thisWeek && c.userId === currentUser.id
-  )
+  const feedCapsules = capsules
+    .filter(c => c.status === 'published')
+    .sort((a, b) => {
+      const recency = (Date.parse(b.publishedAt ?? b.weekStartDate) - Date.parse(a.publishedAt ?? a.weekStartDate))
+      if (recency !== 0) return recency
+      const aTrust = getUserById(a.userId)?.relationshipStrength ?? 0
+      const bTrust = getUserById(b.userId)?.relationshipStrength ?? 0
+      return bTrust - aTrust
+    })
+
   const pastCapsules = capsules
-    .filter(c => c.weekStartDate !== thisWeek && c.status === 'published')
+    .filter(c => c.status === 'published')
     .sort((a, b) => b.weekStartDate.localeCompare(a.weekStartDate))
     .slice(0, 6)
 
-  const picks = thisWeekCapsule
-    ? [...thisWeekCapsule.picks].sort((a, b) => a.order - b.order)
-    : []
+  const feedItems = feedCapsules.flatMap(capsule => {
+    const author = getUserById(capsule.userId) ?? users[0]
+    return [...capsule.picks]
+      .sort((a, b) => a.order - b.order)
+      .map(pick => ({ pick, capsule, author }))
+  })
 
   return (
     <div style={{
@@ -328,13 +357,10 @@ export default function HomePage() {
       </div>
 
       {/* Top bar */}
-      <div style={{ padding: '56px 24px 16px', position: 'relative', zIndex: 1, maxWidth: 512, margin: '0 auto' }}>
+      <div style={{ padding: '56px 24px 16px', position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.22)' }}>
-            orbit
-          </span>
-          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.18)' }}>
-            {formatWeekShort(thisWeek)}
+            New from people you follow
           </span>
           <Link href="/profile">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -344,10 +370,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Picks or empty state */}
-      {picks.length > 0
-        ? picks.map((pick, i) => (
-            <PickSection key={pick.id} pick={pick} index={i} total={picks.length} />
+      {/* Trusted feed or empty state */}
+      {feedItems.length > 0
+        ? feedItems.map(({ pick, capsule, author }, i) => (
+            <PickSection key={pick.id} pick={pick} capsule={capsule} author={author} index={i} total={feedItems.length} />
           ))
         : <EmptyState />
       }
@@ -359,12 +385,12 @@ export default function HomePage() {
           minHeight: 'calc(100svh - 80px)',
           position: 'relative', zIndex: 1,
           padding: '36px 24px 120px',
-          maxWidth: 512, margin: '0 auto',
+          maxWidth: 600, margin: '0 auto',
           width: '100%',
         }}>
           <div style={{ marginBottom: 22 }}>
             <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
-              past weeks
+              recent shares
             </span>
           </div>
           {pastCapsules.map((c, i) => (

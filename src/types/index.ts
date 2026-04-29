@@ -1,4 +1,4 @@
-export type Category = 'Read' | 'Watch' | 'Listen' | 'Idea' | 'Wild Card'
+export type Category = 'Read' | 'Watch' | 'Listen' | 'Idea' | 'Other'
 
 export interface User {
   id: string
@@ -6,6 +6,8 @@ export interface User {
   username: string
   bio: string
   avatar: string
+  relationshipStrength?: number
+  orbit?: string[]
 }
 
 export interface Pick {
@@ -13,7 +15,7 @@ export interface Pick {
   capsuleId: string
   category: Category
   title: string
-  source: string
+  source?: string
   url?: string
   thumbnail?: string
   note: string

@@ -25,7 +25,7 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   title: "Orbit",
-  description: "A weekly ritual for sharing the best things that shaped your week.",
+  description: "Share and follow the things worth coming back to.",
   icons: {
     icon: '/favicon.ico',
   },
