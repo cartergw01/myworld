@@ -101,21 +101,35 @@ function PickSection({ pick, author, capsule, index, total }: { pick: PickType; 
       }} />
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* Category + author row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color }}>
-            <CategoryGlyph category={pick.category} size={13} />
-            <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-              {pick.category}
-            </span>
+        {/* Category + author */}
+        <div style={{ marginBottom: 22 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color }}>
+              <CategoryGlyph category={pick.category} size={13} />
+              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+                {pick.category}
+              </span>
+            </div>
+            <Link
+              href={author.id === 'user_carter' ? '/profile' : `/profile?person=${author.id}`}
+              style={{ textDecoration: 'none' }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={author.avatar} alt={author.name}
+                style={{ width: 24, height: 24, borderRadius: '50%', opacity: 0.7, border: '1px solid rgba(255,255,255,0.08)' }} />
+            </Link>
           </div>
           <Link
             href={author.id === 'user_carter' ? '/profile' : `/profile?person=${author.id}`}
             style={{ textDecoration: 'none' }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={author.avatar} alt={author.name}
-              style={{ width: 24, height: 24, borderRadius: '50%', opacity: 0.7, border: '1px solid rgba(255,255,255,0.08)' }} />
+            <span style={{
+              fontFamily: "'Space Mono',monospace",
+              fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: 'rgba(240,235,225,0.32)',
+            }}>
+              from {author.name.split(' ')[0]}
+            </span>
           </Link>
         </div>
 
