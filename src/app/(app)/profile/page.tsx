@@ -3,62 +3,129 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { CategoryGlyph } from '@/components/capsule/CategoryGlyph'
 import { useStore } from '@/lib/store'
-import { formatWeekLabel, formatWeekShort, getCategoryColor, getWeekStartDate } from '@/lib/utils'
-import type { Capsule } from '@/types'
+import { formatWeekShort, getCategoryColor, getWeekStartDate } from '@/lib/utils'
+import type { Capsule, Category } from '@/types'
 
-function CapsuleTimelineRow({ capsule }: { capsule: Capsule }) {
-  const firstPick = capsule.picks[0]
+function CapsuleArchiveRow({ capsule, index }: { capsule: Capsule; index: number }) {
+  return (
+    <Link href={`/capsule/${capsule.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+      <div style={{
+        padding: '13px 0 13px 16px',
+        borderLeft: `2px solid rgba(255,255,255,${index === 0 ? '0.12' : '0.06'})`,
+        display: 'flex', alignItems: 'center', gap: 14,
+        transition: 'border-color 0.2s',
+      }}>
+        <span style={{
+          fontFamily: "'Space Mono',monospace", fontSize: 8,
+          letterSpacing: '0.1em', textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.2)', flexShrink: 0, minWidth: 52,
+        }}>
+          {formatWeekShort(capsule.weekStartDate)}
+        </span>
+        <span style={{
+          fontFamily: "'Instrument Serif',serif", fontSize: 15,
+          color: 'rgba(240,235,225,0.55)', flex: 1,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {capsule.picks[0]?.title ?? formatWeekLabel(capsule.weekStartDate)}
+        </span>
+        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+          {capsule.picks.map(p => (
+            <div key={p.id} style={{
+              width: 5, height: 5, borderRadius: '50%',
+              background: getCategoryColor(p.category), opacity: 0.6,
+            }} />
+          ))}
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+const CATEGORIES: Category[] = ['Read', 'Watch', 'Listen', 'Idea', 'Other']
+
+function TypeDistributionBar({ capsules }: { capsules: Capsule[] }) {
+  const counts: Record<string, number> = {}
+  let total = 0
+  for (const c of capsules) {
+    for (const p of c.picks) {
+      counts[p.category] = (counts[p.category] ?? 0) + 1
+      total++
+    }
+  }
+  if (total === 0) return null
 
   return (
-    <div className="relative pl-8">
-      <div
-        className="absolute left-[7px] top-0 h-full w-px"
-        style={{ background: 'linear-gradient(to bottom, rgba(200,168,130,0.32), rgba(255,255,255,0.04))' }}
-      />
-      <div
-        className="absolute left-0 top-2 h-[15px] w-[15px] rounded-full"
-        style={{
-          background: 'rgba(200,168,130,0.14)',
-          border: '1px solid rgba(200,168,130,0.5)',
-          boxShadow: '0 0 28px rgba(200,168,130,0.16)',
-        }}
-      />
-      <Link href={`/capsule/${capsule.id}`} className="group block pb-8">
-        <div className="flex items-start justify-between gap-5">
-          <div className="min-w-0">
-            <p className="font-mono-orbit mb-2 text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(255,255,255,0.22)' }}>
-              {formatWeekLabel(capsule.weekStartDate)}
-            </p>
-            <h3 className="font-serif-orbit text-[1.9rem] leading-[1.02] transition-colors duration-200 group-hover:text-[#C8A882]" style={{ color: '#F0EBE1' }}>
-              {firstPick?.title ?? 'Untitled share'}
-            </h3>
-            {firstPick?.source && (
-              <p className="font-serif-orbit mt-1 text-sm italic" style={{ color: 'rgba(240,235,225,0.36)' }}>
-                {firstPick.source}
-              </p>
-            )}
-          </div>
-          <div className="flex shrink-0 flex-col items-end gap-2 pt-1">
-            <span className="font-mono-orbit text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.18)' }}>
-              {capsule.picks.length} items
-            </span>
-            <div className="flex gap-1.5">
-              {capsule.picks.map(pick => (
-                <span
-                  key={pick.id}
-                  className="flex h-5 w-5 items-center justify-center"
-                  style={{ color: getCategoryColor(pick.category) }}
-                >
-                  <CategoryGlyph category={pick.category} size={11} />
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Link>
+    <div style={{ marginBottom: 28 }}>
+      <div style={{ display: 'flex', gap: 2, height: 2, borderRadius: 2, overflow: 'hidden', marginBottom: 10 }}>
+        {CATEGORIES.filter(cat => counts[cat]).map(cat => (
+          <div key={cat} style={{
+            flex: counts[cat],
+            background: getCategoryColor(cat),
+            opacity: 0.7,
+          }} />
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+        {CATEGORIES.filter(cat => counts[cat]).map(cat => (
+          <span key={cat} style={{
+            fontFamily: "'Space Mono',monospace", fontSize: 8,
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            color: getCategoryColor(cat), opacity: 0.65,
+          }}>
+            {counts[cat]} {cat.toLowerCase()}
+          </span>
+        ))}
+      </div>
     </div>
+  )
+}
+
+function StarField() {
+  const stars = Array.from({ length: 45 }, (_, i) => ({
+    cx: ((i * 137.508 + 23) % 369) + 3,
+    cy: ((i * 97.301 + 41) % 800) + 4,
+    r:  (i % 5) * 0.18 + 0.1,
+    o:  (i % 8) * 0.022 + 0.05,
+  }))
+  return (
+    <svg style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}
+      viewBox="0 0 375 800" preserveAspectRatio="xMidYMid slice">
+      {stars.map((s, i) => (
+        <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={`rgba(200,210,255,${s.o})`} />
+      ))}
+    </svg>
+  )
+}
+
+function PolarGrid() {
+  const rings = [55, 105, 160, 220]
+  const radials = Array.from({ length: 12 }, (_, i) => i * 30)
+  return (
+    <svg
+      style={{
+        position: 'fixed', inset: 0, width: '100%', height: '100%',
+        zIndex: 0, pointerEvents: 'none', opacity: 0.25,
+        animation: 'orbitGridSpin 120s linear infinite',
+        transformOrigin: '50% 30%',
+      }}
+      viewBox="0 0 375 700" preserveAspectRatio="xMidYMid slice"
+    >
+      {rings.map(r => (
+        <circle key={r} cx={187} cy={210} r={r}
+          fill="none" stroke="rgba(60,100,220,0.3)" strokeWidth="0.6"
+          strokeDasharray={r > 130 ? '3 8' : '2 6'} />
+      ))}
+      {radials.map(a => {
+        const rad = a * Math.PI / 180
+        return (
+          <line key={a} x1={187} y1={210}
+            x2={187 + Math.cos(rad) * 250} y2={210 + Math.sin(rad) * 250}
+            stroke="rgba(60,100,220,0.1)" strokeWidth="0.5" />
+        )
+      })}
+    </svg>
   )
 }
 
@@ -70,10 +137,7 @@ function ProfileContent() {
   const viewedUser = personId ? getUserById(personId) ?? currentUser : currentUser
   const isCurrentUser = viewedUser.id === currentUser.id
   const baseProfileHref = isCurrentUser ? '/profile' : `/profile?person=${viewedUser.id}`
-  const profileHref = (tab: 'overview' | 'archive') => {
-    if (tab === 'overview') return baseProfileHref
-    return isCurrentUser ? '/profile?tab=archive' : `/profile?person=${viewedUser.id}&tab=archive`
-  }
+  const archiveHref = isCurrentUser ? '/profile?tab=archive' : `/profile?person=${viewedUser.id}&tab=archive`
 
   const published = capsules.filter(c => c.status === 'published' && c.userId === viewedUser.id)
   const totalPicks = published.reduce((acc, c) => acc + c.picks.length, 0)
@@ -86,138 +150,175 @@ function ProfileContent() {
   const profileSummary = sorted[0]
     ? `${published.length} weeks · ${totalPicks} items · latest ${formatWeekShort(sorted[0].weekStartDate)}`
     : 'Nothing shared yet'
-  const pageTitle = isCurrentUser ? 'My Orbit' : `${viewedUser.name}'s Orbit`
 
   return (
-    <div className="min-h-screen pb-safe">
-      <div className="mx-auto max-w-lg px-5 pt-12">
-        <div className="mb-9 flex items-center justify-between">
-          <h1 className="font-serif-orbit text-[2.9rem] leading-none tracking-[-0.02em]" style={{ color: '#F0EBE1' }}>
-            {activeTab === 'archive' ? 'Archive' : pageTitle}
-          </h1>
-          <div className="flex gap-5">
-            {activeTab !== 'archive' && (
-              <Link
-                href={profileHref('archive')}
-                className="font-mono-orbit border-b pb-1 text-[9px] uppercase tracking-[0.16em] transition-colors duration-200"
-                style={{
-                  borderColor: 'rgba(200,168,130,0.35)',
-                  color: '#C8A882',
-                }}
-              >
-                archive
-              </Link>
-            )}
-          </div>
+    <div style={{
+      minHeight: '100svh',
+      background: 'linear-gradient(160deg,#0b0820 0%,#06091a 50%,#03060e 100%)',
+      position: 'relative',
+      paddingBottom: 100,
+    }}>
+      <StarField />
+      <PolarGrid />
+
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: 512, margin: '0 auto', padding: '52px 24px 0' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
+          {activeTab === 'archive' ? (
+            <Link href={baseProfileHref} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.35)' }}>
+              <svg viewBox="0 0 14 14" width={14} height={14} fill="none">
+                <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' }}>back</span>
+            </Link>
+          ) : (
+            <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.22)' }}>
+              orbit
+            </span>
+          )}
+          {activeTab !== 'archive' && (
+            <Link href={archiveHref} style={{
+              fontFamily: "'Space Mono',monospace", fontSize: 9,
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.25)', textDecoration: 'none',
+              borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 2,
+            }}>
+              archive
+            </Link>
+          )}
         </div>
 
         {activeTab === 'overview' ? (
-          <div>
-            <section className="profile-overview relative pb-8">
-              <div
-                className="pointer-events-none absolute left-1/2 top-36 h-80 w-80 -translate-x-1/2 rounded-full blur-[86px]"
-                style={{ background: 'rgba(200,168,130,0.1)' }}
-              />
-              <div className="profile-hero relative mx-auto flex min-h-[390px] max-w-[360px] flex-col items-center justify-center text-center">
-                <div className="profile-ring-large absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ border: '1px dashed rgba(200,168,130,0.18)' }} />
-                <div className="profile-ring-small absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ border: '1px solid rgba(255,255,255,0.07)' }} />
-                <div className="relative">
+          <>
+            {/* Avatar + name */}
+            <div style={{ textAlign: 'center', marginBottom: 32, position: 'relative' }}>
+              <div style={{
+                position: 'absolute', top: '30%', left: '50%',
+                transform: 'translate(-50%,-50%)',
+                width: 260, height: 260, borderRadius: '50%',
+                background: 'rgba(200,168,130,0.07)', filter: 'blur(60px)',
+                pointerEvents: 'none',
+              }} />
+              <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', display: 'inline-block', marginBottom: 20 }}>
+                  <div style={{ position: 'absolute', inset: -18, borderRadius: '50%', border: '1px dashed rgba(200,168,130,0.16)' }} />
+                  <div style={{ position: 'absolute', inset: -36, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.05)' }} />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={viewedUser.avatar}
-                    alt={viewedUser.name}
-                    className="mx-auto mb-5 h-[88px] w-[88px] rounded-full"
-                    style={{ border: '1px solid rgba(200,168,130,0.42)', boxShadow: '0 0 42px rgba(200,168,130,0.16)' }}
-                  />
-                  <h2 className="profile-name font-serif-orbit text-[2.65rem] leading-none tracking-[-0.02em]" style={{ color: '#F0EBE1' }}>
-                    {viewedUser.name}
-                  </h2>
-                  <p className="font-mono-orbit mt-2 text-[9px] uppercase tracking-[0.18em]" style={{ color: 'rgba(255,255,255,0.28)' }}>
-                    @{viewedUser.username}
-                  </p>
-                  <p className="font-serif-orbit mx-auto mt-5 max-w-[260px] text-[1.08rem] italic leading-relaxed" style={{ color: 'rgba(240,235,225,0.48)' }}>
+                  <img src={viewedUser.avatar} alt={viewedUser.name}
+                    style={{ width: 80, height: 80, borderRadius: '50%', display: 'block',
+                      border: '1px solid rgba(200,168,130,0.38)', boxShadow: '0 0 36px rgba(200,168,130,0.14)' }} />
+                </div>
+                <h2 style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 38, lineHeight: 1, letterSpacing: '-0.02em',
+                  color: '#F0EBE1', marginBottom: 6,
+                }}>
+                  {viewedUser.name}
+                </h2>
+                <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', marginBottom: 14 }}>
+                  @{viewedUser.username}
+                </p>
+                {viewedUser.bio && (
+                  <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 15, fontStyle: 'italic', lineHeight: 1.6, color: 'rgba(240,235,225,0.44)', marginBottom: 14, maxWidth: 260, margin: '0 auto 14px' }}>
                     {viewedUser.bio}
                   </p>
-                  <div className="mt-5 flex flex-wrap justify-center gap-x-3 gap-y-1">
-                    {viewedUser.orbit?.map(tag => (
-                      <span key={tag} className="font-mono-orbit text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(200,168,130,0.6)' }}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                )}
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '4px 12px' }}>
+                  {viewedUser.orbit?.map(tag => (
+                    <span key={tag} style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.55)' }}>
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
-
-              <p className="font-mono-orbit mx-auto max-w-[360px] text-center text-[9px] uppercase tracking-[0.14em]" style={{ color: 'rgba(240,235,225,0.26)' }}>
-                {profileSummary}
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <p className="font-mono-orbit mb-6 text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(255,255,255,0.2)' }}>
-                This week
-              </p>
-
-              {thisWeekCapsule ? (
-                <CapsuleTimelineRow capsule={thisWeekCapsule} />
-              ) : isCurrentUser ? (
-                <Link href="/create" className="block border-l pl-6" style={{ borderColor: 'rgba(200,168,130,0.3)' }}>
-                  <p className="font-serif-orbit text-[2rem] leading-none" style={{ color: '#F0EBE1' }}>
-                    Share this week
-                  </p>
-                  <p className="font-mono-orbit mt-2 text-[9px] uppercase tracking-[0.14em]" style={{ color: 'rgba(200,168,130,0.65)' }}>
-                    Share something
-                  </p>
-                </Link>
-              ) : (
-                <div className="border-l pl-6" style={{ borderColor: 'rgba(200,168,130,0.3)' }}>
-                  <p className="font-serif-orbit text-[2rem] leading-none" style={{ color: '#F0EBE1' }}>
-                    Waiting for something new.
-                  </p>
-                  <p className="font-mono-orbit mt-2 text-[9px] uppercase tracking-[0.14em]" style={{ color: 'rgba(200,168,130,0.65)' }}>
-                    Nothing shared this week
-                  </p>
-                </div>
-              )}
-            </section>
-          </div>
-        ) : (
-          <section>
-            <div className="mb-10">
-              <p className="font-mono-orbit mb-3 text-[9px] uppercase tracking-[0.18em]" style={{ color: 'rgba(255,255,255,0.22)' }}>
-                {pageTitle}
-              </p>
-              <h2 className="font-serif-orbit text-[2.55rem] leading-[0.98]" style={{ color: '#F0EBE1' }}>
-                A living record of what held your attention.
-              </h2>
             </div>
 
-            {sorted.length === 0 ? (
-              isCurrentUser ? (
-                <Link href="/create" className="block border-l pl-6" style={{ borderColor: 'rgba(200,168,130,0.3)' }}>
-                  <p className="font-serif-orbit text-[2rem] leading-none" style={{ color: '#F0EBE1' }}>
-                    Nothing here yet.
-                  </p>
-                  <p className="font-mono-orbit mt-2 text-[9px] uppercase tracking-[0.14em]" style={{ color: 'rgba(200,168,130,0.65)' }}>
-                    Share something
-                  </p>
-                </Link>
-              ) : (
-                <div className="border-l pl-6" style={{ borderColor: 'rgba(200,168,130,0.3)' }}>
-                  <p className="font-serif-orbit text-[2rem] leading-none" style={{ color: '#F0EBE1' }}>
-                    Nothing here yet.
-                  </p>
-                  <p className="font-mono-orbit mt-2 text-[9px] uppercase tracking-[0.14em]" style={{ color: 'rgba(200,168,130,0.65)' }}>
-                    Nothing shared yet
-                  </p>
-                </div>
-              )
+            {/* Stats */}
+            <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', textAlign: 'center', marginBottom: 32 }}>
+              {profileSummary}
+            </p>
+
+            {/* Type distribution */}
+            <TypeDistributionBar capsules={published} />
+
+            {/* Divider */}
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 24 }} />
+
+            {/* This week */}
+            <div style={{ marginBottom: 8 }}>
+              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
+                this week
+              </span>
+            </div>
+
+            {thisWeekCapsule ? (
+              <CapsuleArchiveRow capsule={thisWeekCapsule} index={0} />
+            ) : isCurrentUser ? (
+              <Link href="/create" style={{ textDecoration: 'none', display: 'block', padding: '12px 0 12px 16px', borderLeft: '2px solid rgba(200,168,130,0.25)' }}>
+                <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, color: '#F0EBE1', marginBottom: 6 }}>
+                  Share this week
+                </p>
+                <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.55)' }}>
+                  ✦ add something
+                </span>
+              </Link>
             ) : (
-              sorted.map(capsule => (
-                <CapsuleTimelineRow key={capsule.id} capsule={capsule} />
-              ))
+              <div style={{ padding: '12px 0 12px 16px', borderLeft: '2px solid rgba(255,255,255,0.06)' }}>
+                <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 18, fontStyle: 'italic', color: 'rgba(240,235,225,0.3)' }}>
+                  Nothing shared yet this week.
+                </p>
+              </div>
             )}
-          </section>
+
+            {/* Recent past weeks */}
+            {sorted.length > 0 && (
+              <>
+                <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '24px 0 16px' }} />
+                <div style={{ marginBottom: 8 }}>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
+                    recent
+                  </span>
+                </div>
+                {sorted.slice(0, 4).map((c, i) => (
+                  <CapsuleArchiveRow key={c.id} capsule={c} index={i + 1} />
+                ))}
+                {sorted.length > 4 && (
+                  <Link href={archiveHref} style={{
+                    display: 'block', paddingLeft: 16, marginTop: 8,
+                    fontFamily: "'Space Mono',monospace", fontSize: 9,
+                    letterSpacing: '0.14em', textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.22)', textDecoration: 'none',
+                  }}>
+                    + {sorted.length - 4} more weeks
+                  </Link>
+                )}
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: 34, lineHeight: 1.05, letterSpacing: '-0.01em',
+              color: '#F0EBE1', marginBottom: 6,
+            }}>
+              Archive
+            </h2>
+            <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', marginBottom: 28 }}>
+              {totalPicks} items across {published.length} weeks
+            </p>
+
+            <TypeDistributionBar capsules={published} />
+
+            {sorted.length === 0 ? (
+              <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 20, fontStyle: 'italic', color: 'rgba(240,235,225,0.28)' }}>
+                Nothing here yet.
+              </p>
+            ) : (
+              sorted.map((c, i) => <CapsuleArchiveRow key={c.id} capsule={c} index={i} />)
+            )}
+          </>
         )}
       </div>
     </div>
