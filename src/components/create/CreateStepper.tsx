@@ -20,9 +20,10 @@ function emptyPick(capsuleId: string, order: number): Partial<Pick> {
 
 interface CreateStepperProps {
   initialCapsule?: Capsule
+  onDone?: () => void
 }
 
-export function CreateStepper({ initialCapsule }: CreateStepperProps) {
+export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
   const router = useRouter()
   const { addCapsule, updateCapsule, currentUser } = useStore()
 
@@ -115,7 +116,7 @@ export function CreateStepper({ initialCapsule }: CreateStepperProps) {
     } else {
       addCapsule(capsule)
     }
-    setTimeout(() => router.push('/home'), 650)
+    setTimeout(() => { if (onDone) onDone(); else router.push('/home') }, 650)
   }
 
   const activePick = picks[activeIndex] ?? picks[0]
@@ -130,8 +131,8 @@ export function CreateStepper({ initialCapsule }: CreateStepperProps) {
         position: 'relative',
         maxWidth: 512,
         margin: '0 auto',
-        minHeight: 'calc(100svh - 80px)',
-        overflowY: 'auto',
+        minHeight: onDone ? '100svh' : 'calc(100svh - 80px)',
+        overflowY: onDone ? 'visible' : 'auto',
         padding: '0 24px',
       }}
     >
@@ -377,7 +378,7 @@ export function CreateStepper({ initialCapsule }: CreateStepperProps) {
       {/* Fixed action bar */}
       <div style={{
         position: 'fixed',
-        bottom: 80,
+        bottom: onDone ? 0 : 80,
         left: 0, right: 0,
         zIndex: 40,
         background: 'linear-gradient(to bottom, transparent, rgba(4,6,16,0.97) 30%)',

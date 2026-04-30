@@ -1,12 +1,13 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSearchParams } from 'next/navigation'
 import { useStore } from '@/lib/store'
 import { formatWeekLabel, formatWeekShort, getCategoryColor, getWeekStartDate } from '@/lib/utils'
 import { CategoryGlyph } from '@/components/capsule/CategoryGlyph'
+import { CreateStepper } from '@/components/create/CreateStepper'
 import type { Capsule, Category, Pick } from '@/types'
 
 function CapsuleArchiveRow({ capsule, index }: { capsule: Capsule; index: number }) {
@@ -139,6 +140,10 @@ function ProfileContent() {
 
   const following = isFollowing(viewedUser.id)
 
+  const [showCreate, setShowCreate] = useState(false)
+  const [createDraft, setCreateDraft] = useState<Capsule | undefined>()
+  const openCreate = (draft?: Capsule) => { setCreateDraft(draft); setShowCreate(true) }
+
   const published = capsules.filter(c => c.status === 'published' && c.userId === viewedUser.id)
   const totalPicks = published.reduce((acc, c) => acc + c.picks.length, 0)
 
@@ -167,6 +172,7 @@ function ProfileContent() {
     .reverse()
 
   return (
+    <>
     <div style={{ minHeight: '100svh', position: 'relative', paddingBottom: 100 }}>
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 512, margin: '0 auto', padding: '52px 24px 0' }}>
 
@@ -301,7 +307,7 @@ function ProfileContent() {
             {thisWeekCapsule ? (
               <CapsuleArchiveRow capsule={thisWeekCapsule} index={0} />
             ) : thisWeekDraft ? (
-              <Link href={`/create?draft=${thisWeekDraft.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+              <button type="button" onClick={() => openCreate(thisWeekDraft)} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}>
                 <div style={{
                   padding: '12px 16px 12px 16px',
                   borderLeft: '2px dashed rgba(200,168,130,0.3)',
@@ -319,16 +325,16 @@ function ProfileContent() {
                     continue →
                   </span>
                 </div>
-              </Link>
+              </button>
             ) : isCurrentUser ? (
-              <Link href="/create" style={{ textDecoration: 'none', display: 'block', padding: '12px 0 12px 16px', borderLeft: '2px solid rgba(200,168,130,0.25)' }}>
+              <button type="button" onClick={() => openCreate()} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '12px 0 12px 16px', borderLeft: '2px solid rgba(200,168,130,0.25)', textAlign: 'left' }}>
                 <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, color: '#F0EBE1', marginBottom: 6 }}>
                   Share this week
                 </p>
                 <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.55)' }}>
                   ✦ add something
                 </span>
-              </Link>
+              </button>
             ) : (
               <div style={{ padding: '12px 0 12px 16px', borderLeft: '2px solid rgba(255,255,255,0.06)' }}>
                 <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 18, fontStyle: 'italic', color: 'rgba(240,235,225,0.3)' }}>
@@ -403,6 +409,46 @@ function ProfileContent() {
         )}
       </div>
     </div>
+    <AnimatePresence>
+      {showCreate && (
+        <motion.div
+          key="create-overlay"
+          initial={{ opacity: 0, x: '30%' }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: '30%' }}
+          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 100,
+            backgroundColor: 'rgb(4,6,16)',
+            overflowY: 'scroll',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setShowCreate(false)}
+            style={{
+              position: 'fixed', top: 52, right: 20, zIndex: 110,
+              background: 'rgba(4,6,16,0.75)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.09)',
+              borderRadius: 999,
+              padding: '9px 16px',
+              fontFamily: "'Space Mono',monospace",
+              fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: 'rgba(240,235,225,0.45)',
+              cursor: 'pointer',
+              display: 'flex', alignItems: 'center',
+              minHeight: 44,
+            }}
+          >
+            ✕
+          </button>
+          <CreateStepper initialCapsule={createDraft} onDone={() => setShowCreate(false)} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   )
 }
 

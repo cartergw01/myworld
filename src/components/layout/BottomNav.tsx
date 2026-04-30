@@ -15,16 +15,6 @@ const tabs = [
     ),
   },
   {
-    href: '/create',
-    label: 'add',
-    icon: (active: boolean) => (
-      <svg viewBox="0 0 20 20" width={20} height={20} fill="none">
-        <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth={active ? 1.5 : 1.2} />
-        <path d="M10 7v6M7 10h6" stroke="currentColor" strokeWidth={active ? 1.6 : 1.3} strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
     href: '/profile',
     label: 'me',
     icon: (active: boolean) => (
