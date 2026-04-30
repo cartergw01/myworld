@@ -31,7 +31,7 @@ const StoreContext = createContext<StoreContextValue | null>(null)
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [capsules, setCapsules] = useState<Capsule[]>(seedCapsules)
   const [savedItems, setSavedItems] = useState<SavedItem[]>([])
-  const [following, setFollowing] = useState<string[]>(['user_maya', 'user_jules'])
+  const [following, setFollowing] = useState<string[]>(['user_maya', 'user_jules', 'user_leo', 'user_nia', 'user_priya'])
   const [resonated, setResonated] = useState<ReadonlySet<string>>(new Set())
 
   const addCapsule = (capsule: Capsule) => {
