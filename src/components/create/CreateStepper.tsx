@@ -188,7 +188,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
               <span style={{
                 fontFamily: "'Space Mono',monospace",
                 fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.22)',
+                color: 'rgba(255,255,255,0.42)',
                 marginLeft: 4,
               }}>
                 {activeIndex + 1} / {picks.length}
@@ -223,7 +223,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
                         borderRadius: 4,
                         border: '1px solid rgba(255,255,255,0.09)',
                         background: 'transparent',
-                        color: 'rgba(255,255,255,0.4)',
+                        color: 'rgba(255,255,255,0.60)',
                         fontFamily: "'Space Mono',monospace",
                         fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase',
                         cursor: 'pointer',
@@ -235,7 +235,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
                       }}
                       onMouseLeave={e => {
                         e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)'
-                        e.currentTarget.style.color = 'rgba(255,255,255,0.4)'
+                        e.currentTarget.style.color = 'rgba(255,255,255,0.60)'
                       }}
                     >
                       <CategoryGlyph category={category} size={11} />
@@ -272,7 +272,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
                   style={{
                     fontFamily: "'Space Mono',monospace",
                     fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.2)',
+                    color: 'rgba(255,255,255,0.40)',
                     background: 'none', border: 'none', cursor: 'pointer',
                     padding: 0,
                   }}
@@ -306,7 +306,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
               value={activePick.title || ''}
               onChange={e => updatePick(activeIndex, { title: e.target.value })}
               placeholder="Title or idea"
-              className="placeholder:text-[rgba(240,235,225,0.28)]"
+              className="placeholder:text-[rgba(240,235,225,0.45)]"
               style={{
                 width: '100%', background: 'transparent', border: 'none', outline: 'none',
                 fontFamily: "'Instrument Serif',serif",
@@ -322,12 +322,12 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
               value={activePick.source || ''}
               onChange={e => updatePick(activeIndex, { source: e.target.value })}
               placeholder="— source or author"
-              className="placeholder:text-[rgba(240,235,225,0.2)]"
+              className="placeholder:text-[rgba(240,235,225,0.38)]"
               style={{
                 width: '100%', background: 'transparent', border: 'none', outline: 'none',
                 fontFamily: "'Instrument Serif',serif",
                 fontSize: 14, fontStyle: 'italic',
-                color: 'rgba(240,235,225,0.42)',
+                color: 'rgba(240,235,225,0.62)',
                 display: 'block',
                 marginBottom: 32,
               }}
@@ -343,13 +343,13 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
               }}
               placeholder="Why will you remember this?"
               rows={3}
-              className="placeholder:text-[rgba(240,235,225,0.22)]"
+              className="placeholder:text-[rgba(240,235,225,0.40)]"
               style={{
                 width: '100%', background: 'transparent', resize: 'none',
                 border: 'none', outline: 'none',
                 fontFamily: "'Instrument Serif',serif",
                 fontSize: 18, fontStyle: 'italic', lineHeight: 1.75,
-                color: 'rgba(240,235,225,0.7)',
+                color: 'rgba(240,235,225,0.85)',
                 display: 'block',
                 marginBottom: 28,
               }}
@@ -361,12 +361,12 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
               value={activePick.url || ''}
               onChange={e => updatePick(activeIndex, { url: e.target.value })}
               placeholder="Link (optional)"
-              className="placeholder:text-[rgba(255,255,255,0.16)]"
+              className="placeholder:text-[rgba(255,255,255,0.32)]"
               style={{
                 width: '100%', background: 'transparent', border: 'none', outline: 'none',
                 fontFamily: "'Space Mono',monospace",
                 fontSize: 9, letterSpacing: '0.08em',
-                color: 'rgba(255,255,255,0.35)',
+                color: 'rgba(255,255,255,0.55)',
                 display: 'block',
               }}
             />
@@ -413,7 +413,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
                   style={{
                     fontFamily: "'Space Mono',monospace",
                     fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
-                    color: 'rgba(200,168,130,0.6)',
+                    color: 'rgba(200,168,130,0.82)',
                   }}
                 >
                   ✓&nbsp;&nbsp;Draft saved
@@ -427,7 +427,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
                   style={{
                     fontFamily: "'Instrument Serif',serif",
                     fontSize: 14, fontStyle: 'italic',
-                    color: 'rgba(240,235,225,0.5)',
+                    color: 'rgba(240,235,225,0.72)',
                   }}
                 >
                   Added to your sky.
@@ -448,7 +448,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
                   style={{
                     fontFamily: "'Space Mono',monospace",
                     fontSize: 9, letterSpacing: '0.13em', textTransform: 'uppercase',
-                    color: 'rgba(200,168,130,0.45)',
+                    color: 'rgba(200,168,130,0.65)',
                     background: 'none', border: 'none', cursor: 'pointer', padding: 0,
                     whiteSpace: 'nowrap', minHeight: 44, display: 'flex', alignItems: 'center',
                   }}
@@ -463,7 +463,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
                   style={{
                     fontFamily: "'Space Mono',monospace",
                     fontSize: 9, letterSpacing: '0.13em', textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.18)',
+                    color: 'rgba(255,255,255,0.38)',
                     background: 'none', border: 'none', cursor: 'pointer', padding: 0,
                     whiteSpace: 'nowrap', minHeight: 44, display: 'flex', alignItems: 'center',
                   }}
@@ -483,7 +483,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
               style={{
                 fontFamily: "'Space Mono',monospace",
                 fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
-                color: draftSaved ? 'rgba(200,168,130,0.85)' : 'rgba(255,255,255,0.25)',
+                color: draftSaved ? 'rgba(200,168,130,0.95)' : 'rgba(255,255,255,0.45)',
                 background: 'none', border: 'none',
                 padding: '0 16px',
                 minHeight: 44,
@@ -507,7 +507,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
                 fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase',
                 fontWeight: 700,
                 background: readyToPublish ? '#C8A882' : 'rgba(200,168,130,0.1)',
-                color: readyToPublish ? '#0A0A0A' : 'rgba(200,168,130,0.32)',
+                color: readyToPublish ? '#0A0A0A' : 'rgba(200,168,130,0.52)',
                 border: 'none', borderRadius: 999,
                 padding: '0 28px',
                 minHeight: 44,

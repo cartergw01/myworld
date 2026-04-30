@@ -21,13 +21,13 @@ function CapsuleArchiveRow({ capsule, index }: { capsule: Capsule; index: number
         <span style={{
           fontFamily: "'Space Mono',monospace", fontSize: 8,
           letterSpacing: '0.1em', textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.2)', flexShrink: 0, minWidth: 52,
+          color: 'rgba(255,255,255,0.38)', flexShrink: 0, minWidth: 52,
         }}>
           {formatWeekShort(capsule.weekStartDate)}
         </span>
         <span style={{
           fontFamily: "'Instrument Serif',serif", fontSize: 15,
-          color: 'rgba(240,235,225,0.55)', flex: 1,
+          color: 'rgba(240,235,225,0.75)', flex: 1,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {capsule.picks[0]?.title ?? formatWeekLabel(capsule.weekStartDate)}
@@ -68,7 +68,7 @@ function SavedPickRow({ pick, capsule }: { pick: Pick; capsule: Capsule }) {
             <span style={{
               fontFamily: "'Space Mono',monospace", fontSize: 8,
               letterSpacing: '0.1em', textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.25)',
+              color: 'rgba(255,255,255,0.45)',
             }}>
               {pick.source || formatWeekShort(capsule.weekStartDate)}
             </span>
@@ -179,14 +179,14 @@ function ProfileContent() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
           {activeTab !== 'overview' ? (
-            <Link href={baseProfileHref} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.35)' }}>
+            <Link href={baseProfileHref} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.55)' }}>
               <svg viewBox="0 0 14 14" width={14} height={14} fill="none">
                 <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase' }}>back</span>
             </Link>
           ) : (
-            <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.22)' }}>
+            <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)' }}>
               orbit
             </span>
           )}
@@ -196,7 +196,7 @@ function ProfileContent() {
                 <Link href={savedHref} style={{
                   fontFamily: "'Space Mono',monospace", fontSize: 9,
                   letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.25)', textDecoration: 'none',
+                  color: 'rgba(255,255,255,0.45)', textDecoration: 'none',
                   borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 2,
                 }}>
                   saved
@@ -205,7 +205,7 @@ function ProfileContent() {
               <Link href={archiveHref} style={{
                 fontFamily: "'Space Mono',monospace", fontSize: 9,
                 letterSpacing: '0.14em', textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.25)', textDecoration: 'none',
+                color: 'rgba(255,255,255,0.45)', textDecoration: 'none',
                 borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: 2,
               }}>
                 archive
@@ -241,17 +241,17 @@ function ProfileContent() {
                 }}>
                   {viewedUser.name}
                 </h2>
-                <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', marginBottom: 14 }}>
+                <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: 14 }}>
                   @{viewedUser.username}
                 </p>
                 {viewedUser.bio && (
-                  <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 15, fontStyle: 'italic', lineHeight: 1.6, color: 'rgba(240,235,225,0.44)', marginBottom: 14, maxWidth: 260, margin: '0 auto 14px' }}>
+                  <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 15, fontStyle: 'italic', lineHeight: 1.6, color: 'rgba(240,235,225,0.65)', marginBottom: 14, maxWidth: 260, margin: '0 auto 14px' }}>
                     {viewedUser.bio}
                   </p>
                 )}
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '4px 12px', marginBottom: !isCurrentUser ? 20 : 0 }}>
                   {viewedUser.orbit?.map(tag => (
-                    <span key={tag} style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.55)' }}>
+                    <span key={tag} style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.78)' }}>
                       {tag}
                     </span>
                   ))}
@@ -269,7 +269,7 @@ function ProfileContent() {
                       padding: '10px 20px', borderRadius: 4,
                       transition: 'all 0.25s ease',
                       outline: `1px solid ${following ? 'rgba(200,168,130,0.3)' : 'rgba(255,255,255,0.12)'}`,
-                      color: following ? 'rgba(200,168,130,0.8)' : 'rgba(255,255,255,0.35)',
+                      color: following ? 'rgba(200,168,130,0.8)' : 'rgba(255,255,255,0.55)',
                       minHeight: 44,
                     }}
                   >
@@ -290,7 +290,7 @@ function ProfileContent() {
               </div>
             </div>
 
-            <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', textAlign: 'center', marginBottom: 32 }}>
+            <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', textAlign: 'center', marginBottom: 32 }}>
               {profileSummary}
             </p>
 
@@ -299,7 +299,7 @@ function ProfileContent() {
             <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 24 }} />
 
             <div style={{ marginBottom: 8 }}>
-              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
+              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.36)' }}>
                 this week
               </span>
             </div>
@@ -317,11 +317,11 @@ function ProfileContent() {
                     <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 18, color: '#F0EBE1', marginBottom: 4 }}>
                       {thisWeekDraft.picks[0]?.title || 'Draft in progress'}
                     </p>
-                    <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.5)' }}>
+                    <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.72)' }}>
                       {thisWeekDraft.picks.length} {thisWeekDraft.picks.length === 1 ? 'item' : 'items'} · draft
                     </span>
                   </div>
-                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.4)', flexShrink: 0 }}>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.62)', flexShrink: 0 }}>
                     continue →
                   </span>
                 </div>
@@ -331,13 +331,13 @@ function ProfileContent() {
                 <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, color: '#F0EBE1', marginBottom: 6 }}>
                   Share this week
                 </p>
-                <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.55)' }}>
+                <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.78)' }}>
                   ✦ add something
                 </span>
               </button>
             ) : (
               <div style={{ padding: '12px 0 12px 16px', borderLeft: '2px solid rgba(255,255,255,0.06)' }}>
-                <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 18, fontStyle: 'italic', color: 'rgba(240,235,225,0.3)' }}>
+                <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 18, fontStyle: 'italic', color: 'rgba(240,235,225,0.52)' }}>
                   Nothing shared yet this week.
                 </p>
               </div>
@@ -347,7 +347,7 @@ function ProfileContent() {
               <>
                 <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '24px 0 16px' }} />
                 <div style={{ marginBottom: 8 }}>
-                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.36)' }}>
                     recent
                   </span>
                 </div>
@@ -359,7 +359,7 @@ function ProfileContent() {
                     display: 'block', paddingLeft: 16, marginTop: 8,
                     fontFamily: "'Space Mono',monospace", fontSize: 9,
                     letterSpacing: '0.14em', textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.22)', textDecoration: 'none',
+                    color: 'rgba(255,255,255,0.42)', textDecoration: 'none',
                   }}>
                     + {sorted.length - 4} more weeks
                   </Link>
@@ -374,7 +374,7 @@ function ProfileContent() {
             <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 34, lineHeight: 1.05, letterSpacing: '-0.01em', color: '#F0EBE1', marginBottom: 6 }}>
               Archive
             </h2>
-            <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', marginBottom: 28 }}>
+            <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', marginBottom: 28 }}>
               {totalPicks} items across {published.length} weeks
             </p>
             <TypeDistributionBar capsules={published} />
@@ -393,11 +393,11 @@ function ProfileContent() {
             <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 34, lineHeight: 1.05, letterSpacing: '-0.01em', color: '#F0EBE1', marginBottom: 6 }}>
               Saved
             </h2>
-            <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', marginBottom: 28 }}>
+            <p style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', marginBottom: 28 }}>
               {savedPicks.length} {savedPicks.length === 1 ? 'item' : 'items'}
             </p>
             {savedPicks.length === 0 ? (
-              <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 20, fontStyle: 'italic', color: 'rgba(240,235,225,0.28)', lineHeight: 1.4 }}>
+              <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 20, fontStyle: 'italic', color: 'rgba(240,235,225,0.50)', lineHeight: 1.4 }}>
                 Nothing saved yet.<br />Tap ◎ on any pick to save it.
               </p>
             ) : (
@@ -436,7 +436,7 @@ function ProfileContent() {
               padding: '9px 16px',
               fontFamily: "'Space Mono',monospace",
               fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
-              color: 'rgba(240,235,225,0.45)',
+              color: 'rgba(240,235,225,0.65)',
               cursor: 'pointer',
               display: 'flex', alignItems: 'center',
               minHeight: 44,

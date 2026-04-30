@@ -41,7 +41,7 @@ function CapsuleAuthorBar({ capsule, author, color, currentUserId }: {
           <p style={{
             fontFamily: "'Space Mono',monospace",
             fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.28)',
+            color: 'rgba(255,255,255,0.48)',
           }}>
             {formatWeekShort(capsule.weekStartDate)}&nbsp;&nbsp;·&nbsp;&nbsp;{capsule.picks.length}&nbsp;pick{capsule.picks.length !== 1 ? 's' : ''}
           </p>
@@ -139,7 +139,7 @@ function PickSection({
           <p style={{
             fontFamily: "'Instrument Serif',serif",
             fontSize: 14, fontStyle: 'italic',
-            color: 'rgba(240,235,225,0.4)',
+            color: 'rgba(240,235,225,0.60)',
           }}>
             —&nbsp;{pick.source}
           </p>
@@ -172,7 +172,7 @@ function PickSection({
             <p style={{
               fontFamily: "'Instrument Serif',serif",
               fontSize: 17, fontStyle: 'italic', lineHeight: 1.7,
-              color: 'rgba(240,235,225,0.68)',
+              color: 'rgba(240,235,225,0.84)',
               display: '-webkit-box',
               WebkitLineClamp: 5,
               WebkitBoxOrient: 'vertical' as const,
@@ -227,7 +227,7 @@ function PickSection({
                 style={{
                   fontFamily: "'Space Mono',monospace", fontSize: 9,
                   letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.22)', textDecoration: 'none',
+                  color: 'rgba(255,255,255,0.42)', textDecoration: 'none',
                   minHeight: 44, padding: '0 4px',
                   display: 'flex', alignItems: 'center',
                 }}
@@ -313,7 +313,7 @@ function CapsuleViewer({ capsule, author, onBack }: {
           padding: '9px 16px',
           fontFamily: "'Space Mono',monospace",
           fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
-          color: 'rgba(240,235,225,0.45)',
+          color: 'rgba(240,235,225,0.65)',
           cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: 8,
           minHeight: 44,
@@ -389,7 +389,7 @@ function CapsuleRow({ capsule, author, isUnread, isSelf, index, onOpen }: {
         <p style={{
           fontFamily: "'Instrument Serif',serif",
           fontSize: 19,
-          color: isUnread ? '#F0EBE1' : 'rgba(240,235,225,0.32)',
+          color: isUnread ? '#F0EBE1' : 'rgba(240,235,225,0.52)',
           lineHeight: 1.0, marginBottom: 7,
           transition: 'color 0.4s ease',
         }}>
@@ -406,7 +406,7 @@ function CapsuleRow({ capsule, author, isUnread, isSelf, index, onOpen }: {
           <span style={{
             fontFamily: "'Space Mono',monospace",
             fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase',
-            color: isUnread ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
+            color: isUnread ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.22)',
             marginLeft: 4,
           }}>
             {capsule.picks.length} pick{capsule.picks.length !== 1 ? 's' : ''}
@@ -444,13 +444,13 @@ function PastRow({ capsule, author, index }: { capsule: Capsule; author: User; i
           <span style={{
             fontFamily: "'Space Mono',monospace", fontSize: 8,
             letterSpacing: '0.1em', textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.18)', flexShrink: 0, minWidth: 48,
+            color: 'rgba(255,255,255,0.36)', flexShrink: 0, minWidth: 48,
           }}>
             {formatWeekShort(capsule.weekStartDate)}
           </span>
           <span style={{
             fontFamily: "'Instrument Serif',serif", fontSize: 14,
-            color: 'rgba(240,235,225,0.4)', flex: 1,
+            color: 'rgba(240,235,225,0.60)', flex: 1,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {capsule.picks[0]?.title}
@@ -477,7 +477,7 @@ function EmptyState() {
         <p style={{
           fontFamily: "'Instrument Serif',serif",
           fontSize: 22, fontStyle: 'italic',
-          color: 'rgba(240,235,225,0.2)', lineHeight: 1.45, marginBottom: 24,
+          color: 'rgba(240,235,225,0.40)', lineHeight: 1.45, marginBottom: 24,
         }}>
           Your orbit is quiet.<br />Start with yours.
         </p>
@@ -487,7 +487,7 @@ function EmptyState() {
           border: '1px solid rgba(255,255,255,0.09)', borderRadius: 4,
           fontFamily: "'Space Mono',monospace",
           fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase',
-          color: 'rgba(240,235,225,0.28)',
+          color: 'rgba(240,235,225,0.50)',
         }}>
           ✦&nbsp;&nbsp;share something
         </div>
@@ -571,14 +571,14 @@ export default function HomePage() {
           <span style={{
             fontFamily: "'Space Mono',monospace",
             fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.22)',
+            color: 'rgba(255,255,255,0.42)',
           }}>
             orbit
           </span>
           <span style={{
             fontFamily: "'Space Mono',monospace",
             fontSize: 9, letterSpacing: '0.12em',
-            color: 'rgba(255,255,255,0.16)',
+            color: 'rgba(255,255,255,0.32)',
           }}>
             {formatWeekShort(thisWeek)}
           </span>
@@ -665,7 +665,7 @@ export default function HomePage() {
                 <p style={{
                   fontFamily: "'Instrument Serif',serif",
                   fontSize: 19, fontStyle: 'italic',
-                  color: 'rgba(240,235,225,0.2)', lineHeight: 1.4,
+                  color: 'rgba(240,235,225,0.40)', lineHeight: 1.4,
                 }}>
                   You&rsquo;re caught up.
                 </p>
@@ -680,7 +680,7 @@ export default function HomePage() {
                 <span style={{
                   fontFamily: "'Space Mono',monospace",
                   fontSize: 8, letterSpacing: '0.16em', textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.16)',
+                  color: 'rgba(255,255,255,0.32)',
                 }}>
                   your past weeks
                 </span>

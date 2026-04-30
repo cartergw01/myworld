@@ -96,7 +96,7 @@ export function PickCard({ pick, index = 0 }: PickCardProps) {
             <p style={{
               fontFamily: "'Instrument Serif',serif",
               fontSize: 13, fontStyle: 'italic',
-              color: 'rgba(240,235,225,0.38)',
+              color: 'rgba(240,235,225,0.6)',
               marginBottom: 14,
             }}>
               —&nbsp;{pick.source}
@@ -122,7 +122,7 @@ export function PickCard({ pick, index = 0 }: PickCardProps) {
               <p style={{
                 fontFamily: "'Instrument Serif',serif",
                 fontSize: 16, fontStyle: 'italic', lineHeight: 1.7,
-                color: 'rgba(240,235,225,0.65)',
+                color: 'rgba(240,235,225,0.82)',
               }}>
                 {pick.note}
               </p>
@@ -137,7 +137,7 @@ export function PickCard({ pick, index = 0 }: PickCardProps) {
               style={{
                 fontFamily: "'Space Mono',monospace", fontSize: 9,
                 letterSpacing: '0.14em', textTransform: 'uppercase',
-                color: resonated ? color : 'rgba(255,255,255,0.22)',
+                color: resonated ? color : 'rgba(255,255,255,0.42)',
                 background: 'none', border: 'none', cursor: 'pointer',
                 minHeight: 44, padding: '0 12px 0 0',
                 display: 'flex', alignItems: 'center',
@@ -153,7 +153,7 @@ export function PickCard({ pick, index = 0 }: PickCardProps) {
               style={{
                 fontFamily: "'Space Mono',monospace", fontSize: 9,
                 letterSpacing: '0.14em', textTransform: 'uppercase',
-                color: saved ? 'rgba(200,168,130,0.9)' : 'rgba(255,255,255,0.22)',
+                color: saved ? 'rgba(200,168,130,0.9)' : 'rgba(255,255,255,0.42)',
                 background: 'none', border: 'none', cursor: 'pointer',
                 minHeight: 44, padding: '0 12px 0 0',
                 display: 'flex', alignItems: 'center',
@@ -168,7 +168,7 @@ export function PickCard({ pick, index = 0 }: PickCardProps) {
                 style={{
                   fontFamily: "'Space Mono',monospace", fontSize: 9,
                   letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.22)', textDecoration: 'none',
+                  color: 'rgba(255,255,255,0.42)', textDecoration: 'none',
                   minHeight: 44, padding: '0 4px',
                   display: 'flex', alignItems: 'center',
                 }}
