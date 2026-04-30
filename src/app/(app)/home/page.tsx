@@ -1,89 +1,84 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '@/lib/store'
-import { formatWeekShort, getCategoryColor, getCategoryDim, getWeekStartDate } from '@/lib/utils'
+import { formatWeekShort, getCategoryColor, getWeekStartDate } from '@/lib/utils'
 import { CategoryGlyph } from '@/components/capsule/CategoryGlyph'
-import type { Pick as PickType, Capsule, User } from '@/types'
+import type { Category, Pick as PickType, Capsule, User } from '@/types'
 
-function trustLabel(author: User) {
-  const strength = author.relationshipStrength ?? 0.5
-  if (author.id === 'user_carter') return 'you'
-  if (strength >= 0.9) return 'close friend'
-  if (strength >= 0.7) return 'trusted source'
-  return 'following'
-}
-
-// ─── Polar HUD Grid ─────────────────────────────────
-function PolarGrid() {
-  const rings = [55, 105, 160, 220, 290]
-  const radials = Array.from({ length: 12 }, (_, i) => i * 30)
+// ─── Author bar inside capsule viewer (first pick) ───────────────────────────
+function CapsuleAuthorBar({ capsule, author, color, currentUserId }: {
+  capsule: Capsule; author: User; color: string; currentUserId: string
+}) {
   return (
-    <svg
-      className="absolute inset-0 w-full h-full"
-      viewBox="0 0 375 700"
-      preserveAspectRatio="xMidYMid slice"
-      style={{ animation: 'orbitGridSpin 120s linear infinite', transformOrigin: '50% 30%', opacity: 0.38 }}
-    >
-      {rings.map(r => (
-        <circle key={r} cx={187} cy={210} r={r}
-          fill="none" stroke="rgba(60,100,220,0.28)" strokeWidth="0.6"
-          strokeDasharray={r > 160 ? '3 8' : '2 6'} />
-      ))}
-      {radials.map(a => {
-        const rad = a * Math.PI / 180
-        const x2 = Number((187 + Math.cos(rad) * 300).toFixed(3))
-        const y2 = Number((210 + Math.sin(rad) * 300).toFixed(3))
-        return (
-          <line key={a}
-            x1={187} y1={210}
-            x2={x2} y2={y2}
-            stroke="rgba(60,100,220,0.12)" strokeWidth="0.5" />
-        )
-      })}
-      <line x1={187} y1={190} x2={187} y2={230} stroke="rgba(60,100,220,0.22)" strokeWidth="0.5" />
-      <line x1={167} y1={210} x2={207} y2={210} stroke="rgba(60,100,220,0.22)" strokeWidth="0.5" />
-      <circle cx={187} cy={210} r={4} fill="none" stroke="rgba(60,100,220,0.3)" strokeWidth="0.7" />
-    </svg>
+    <div style={{
+      position: 'absolute', top: 20, left: 24, right: 24, zIndex: 2,
+      display: 'flex', alignItems: 'center', gap: 11,
+    }}>
+      <Link
+        href={author.id === currentUserId ? '/profile' : `/profile?person=${author.id}`}
+        style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 11, flex: 1, minWidth: 0 }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={author.avatar} alt={author.name}
+          style={{
+            width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+            border: `1.5px solid ${color}55`,
+            boxShadow: `0 0 14px ${color}28`,
+          }}
+        />
+        <div style={{ minWidth: 0 }}>
+          <p style={{
+            fontFamily: "'Instrument Serif',serif",
+            fontSize: 17, color: '#F0EBE1', lineHeight: 1,
+            marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}>
+            {author.name}
+          </p>
+          <p style={{
+            fontFamily: "'Space Mono',monospace",
+            fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.28)',
+          }}>
+            {formatWeekShort(capsule.weekStartDate)}&nbsp;&nbsp;·&nbsp;&nbsp;{capsule.picks.length}&nbsp;pick{capsule.picks.length !== 1 ? 's' : ''}
+          </p>
+        </div>
+      </Link>
+    </div>
   )
 }
 
-// ─── Star field ──────────────────────────────────────
-function StarField() {
-  const stars = Array.from({ length: 55 }, (_, i) => ({
-    cx: ((i * 137.508 + 23) % 369) + 3,
-    cy: ((i * 97.301 + 41) % 800) + 4,
-    r:  (i % 5) * 0.18 + 0.12,
-    o:  (i % 8) * 0.025 + 0.06,
-  }))
-  return (
-    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 375 800" preserveAspectRatio="xMidYMid slice">
-      {stars.map((s, i) => (
-        <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={`rgba(200,210,255,${s.o})`} />
-      ))}
-    </svg>
-  )
-}
-
-// ─── Single pick — full-screen snap section ──────────
-function PickSection({ pick, author, capsule, index, total }: { pick: PickType; author: User; capsule: Capsule; index: number; total: number }) {
+// ─── Single pick inside CapsuleViewer ─────────────────────────────────────────
+function PickSection({
+  pick, author, capsule, index, total, isFirstInCapsule, onFocus,
+}: {
+  pick: PickType; author: User; capsule: Capsule
+  index: number; total: number; isFirstInCapsule: boolean
+  onFocus: (category: Category) => void
+}) {
   const color = getCategoryColor(pick.category)
-  const dim   = getCategoryDim(pick.category)
+  const { isItemSaved, saveItem, unsaveItem, isResonated, resonate, unresonate, currentUser } = useStore()
+  const resonated = isResonated(pick.id)
+  const saved = isItemSaved(pick.id)
+  const titleSize = pick.title.length < 18 ? 44 : pick.title.length < 34 ? 36 : 27
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 18 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false, margin: '-12%' }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: false, margin: '-20%' }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      onViewportEnter={() => onFocus(pick.category)}
       style={{
-        height: 'calc(100svh - 80px)',
+        height: '100svh',
         scrollSnapAlign: 'start',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: '0 24px',
+        padding: isFirstInCapsule ? '80px 24px 0' : '0 24px',
         position: 'relative',
         zIndex: 1,
         maxWidth: 512,
@@ -91,106 +86,153 @@ function PickSection({ pick, author, capsule, index, total }: { pick: PickType; 
         width: '100%',
       }}
     >
-      {/* Color bloom */}
+      {isFirstInCapsule && (
+        <CapsuleAuthorBar
+          capsule={capsule} author={author}
+          color={color} currentUserId={currentUser.id}
+        />
+      )}
+
+      {/* Depth bloom */}
       <div style={{
-        position: 'absolute', top: '42%', left: '50%',
+        position: 'absolute', top: '44%', left: '50%',
         transform: 'translate(-50%,-50%)',
-        width: 300, height: 300, borderRadius: '50%',
-        background: dim, filter: 'blur(64px)',
+        width: 440, height: 440, borderRadius: '50%',
+        backgroundColor: color, opacity: 0.09,
+        filter: 'blur(90px)',
         pointerEvents: 'none', zIndex: 0,
       }} />
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* Category + author */}
-        <div style={{ marginBottom: 22 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color }}>
-              <CategoryGlyph category={pick.category} size={13} />
-              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-                {pick.category}
-              </span>
-            </div>
-            <Link
-              href={author.id === 'user_carter' ? '/profile' : `/profile?person=${author.id}`}
-              style={{ textDecoration: 'none' }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={author.avatar} alt={author.name}
-                style={{ width: 24, height: 24, borderRadius: '50%', opacity: 0.7, border: '1px solid rgba(255,255,255,0.08)' }} />
-            </Link>
-          </div>
-          <Link
-            href={author.id === 'user_carter' ? '/profile' : `/profile?person=${author.id}`}
-            style={{ textDecoration: 'none' }}
-          >
-            <span style={{
-              fontFamily: "'Space Mono',monospace",
-              fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
-              color: 'rgba(240,235,225,0.32)',
-            }}>
-              from {author.name.split(' ')[0]}
-            </span>
-          </Link>
+        {/* Category badge */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 7,
+          color, marginBottom: 20,
+          padding: '5px 10px 5px 8px',
+          border: `1px solid ${color}28`,
+          borderRadius: 3,
+          background: `${color}0a`,
+        }}>
+          <CategoryGlyph category={pick.category} size={13} />
+          <span style={{
+            fontFamily: "'Space Mono',monospace",
+            fontSize: 8, letterSpacing: '0.2em', textTransform: 'uppercase',
+          }}>
+            {pick.category}
+          </span>
         </div>
 
         {/* Title */}
         <h2 style={{
           fontFamily: "'Instrument Serif',serif",
-          fontSize: pick.title.length > 32 ? 30 : 38,
-          lineHeight: 1.05,
+          fontSize: titleSize,
+          lineHeight: 1.03,
           color: '#F0EBE1',
-          letterSpacing: '-0.01em',
-          marginBottom: pick.source ? 12 : 0,
+          letterSpacing: titleSize > 36 ? '-0.02em' : '-0.01em',
+          marginBottom: pick.source ? 10 : 0,
         }}>
           {pick.title}
         </h2>
 
         {/* Source */}
         {pick.source && (
-          <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 14, fontStyle: 'italic', color: 'rgba(240,235,225,0.42)' }}>
-            {pick.source}
+          <p style={{
+            fontFamily: "'Instrument Serif',serif",
+            fontSize: 14, fontStyle: 'italic',
+            color: 'rgba(240,235,225,0.4)',
+          }}>
+            —&nbsp;{pick.source}
           </p>
         )}
 
         {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '18px 0' }} />
+        <div style={{
+          height: 1,
+          background: `linear-gradient(to right, ${color}35, transparent 80%)`,
+          margin: '20px 0',
+        }} />
 
         {/* Note */}
         {pick.note && (
-          <p style={{
-            fontFamily: "'Instrument Serif',serif",
-            fontSize: 15, fontStyle: 'italic', lineHeight: 1.7,
-            color: 'rgba(240,235,225,0.48)',
-            marginBottom: 20,
-            display: '-webkit-box',
-            WebkitLineClamp: 5,
-            WebkitBoxOrient: 'vertical' as const,
-            overflow: 'hidden',
-          }}>
-            &ldquo;{pick.note}&rdquo;
-          </p>
+          <div style={{ position: 'relative', marginBottom: 24 }}>
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: -18, left: -6,
+                fontFamily: "'Instrument Serif',serif",
+                fontSize: 80, lineHeight: 1,
+                color, opacity: 0.15,
+                userSelect: 'none', pointerEvents: 'none',
+                letterSpacing: '-0.04em',
+              }}
+            >
+              &ldquo;
+            </span>
+            <p style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: 17, fontStyle: 'italic', lineHeight: 1.7,
+              color: 'rgba(240,235,225,0.68)',
+              display: '-webkit-box',
+              WebkitLineClamp: 5,
+              WebkitBoxOrient: 'vertical' as const,
+              overflow: 'hidden',
+            }}>
+              {pick.note}
+            </p>
+          </div>
         )}
 
         {/* Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-          {['✦  resonate', '◎  save'].map((label, i) => (
-            <span key={i} style={{
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <button
+            type="button"
+            onClick={() => resonated ? unresonate(pick.id) : resonate(pick.id)}
+            style={{
               fontFamily: "'Space Mono',monospace", fontSize: 9,
               letterSpacing: '0.14em', textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.2)', cursor: 'default',
-            }}>{label}</span>
-          ))}
+              color: resonated ? color : 'rgba(255,255,255,0.22)',
+              background: 'none', border: 'none', cursor: 'pointer',
+              minHeight: 44, minWidth: 44,
+              padding: '0 12px 0 0',
+              display: 'flex', alignItems: 'center',
+              transition: 'color 0.25s ease',
+              textShadow: resonated ? `0 0 24px ${color}90` : 'none',
+            }}
+          >
+            ✦&nbsp;&nbsp;resonate
+          </button>
+          <button
+            type="button"
+            onClick={() => saved ? unsaveItem(pick.id) : saveItem(pick.id)}
+            style={{
+              fontFamily: "'Space Mono',monospace", fontSize: 9,
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: saved ? 'rgba(200,168,130,0.9)' : 'rgba(255,255,255,0.22)',
+              background: 'none', border: 'none', cursor: 'pointer',
+              minHeight: 44, minWidth: 44,
+              padding: '0 12px 0 0',
+              display: 'flex', alignItems: 'center',
+              transition: 'color 0.25s ease',
+            }}
+          >
+            ◎&nbsp;&nbsp;save
+          </button>
           {pick.url && (
             <>
-              <div style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.1)' }} />
-              <a href={pick.url} target="_blank" rel="noopener noreferrer"
+              <div style={{ width: 1, height: 10, background: 'rgba(255,255,255,0.07)', margin: '0 4px' }} />
+              <a
+                href={pick.url} target="_blank" rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
                 style={{
                   fontFamily: "'Space Mono',monospace", fontSize: 9,
                   letterSpacing: '0.14em', textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.2)', textDecoration: 'none',
-                }}>
-                ↗  open
+                  color: 'rgba(255,255,255,0.22)', textDecoration: 'none',
+                  minHeight: 44, padding: '0 4px',
+                  display: 'flex', alignItems: 'center',
+                }}
+              >
+                ↗&nbsp;&nbsp;open
               </a>
             </>
           )}
@@ -199,15 +241,18 @@ function PickSection({ pick, author, capsule, index, total }: { pick: PickType; 
 
       {/* Progress dots */}
       <div style={{
-        position: 'absolute', bottom: 22, left: '50%',
+        position: 'absolute', bottom: 28, left: '50%',
         transform: 'translateX(-50%)',
-        display: 'flex', gap: 7, zIndex: 2,
+        display: 'flex', gap: 6, zIndex: 2,
+        alignItems: 'center',
       }}>
         {Array.from({ length: total }).map((_, i) => (
           <div key={i} style={{
-            width: i === index ? 16 : 4, height: 4, borderRadius: 2,
-            background: i === index ? 'rgba(240,235,225,0.6)' : 'rgba(255,255,255,0.15)',
-            transition: 'width 0.3s ease',
+            width: i === index ? 20 : 4,
+            height: 4, borderRadius: 2,
+            backgroundColor: i === index ? color : 'rgba(255,255,255,0.12)',
+            boxShadow: i === index ? `0 0 10px ${color}80` : 'none',
+            transition: 'width 0.35s ease, background-color 0.35s ease',
           }} />
         ))}
       </div>
@@ -215,75 +260,206 @@ function PickSection({ pick, author, capsule, index, total }: { pick: PickType; 
   )
 }
 
-// ─── Empty state ─────────────────────────────────────
-function EmptyState() {
+// ─── Full-screen capsule viewer (slides in over inbox) ────────────────────────
+function CapsuleViewer({ capsule, author, onBack }: {
+  capsule: Capsule; author: User; onBack: () => void
+}) {
+  const [activeCategory, setActiveCategory] = useState<Category | null>(null)
+  const picks = [...capsule.picks].sort((a, b) => a.order - b.order)
+  const glowColor = activeCategory ? getCategoryColor(activeCategory) : '#7BB3FF'
+
   return (
-    <section style={{
-      height: 'calc(100svh - 80px)',
-      scrollSnapAlign: 'start',
-      display: 'flex', flexDirection: 'column',
-      justifyContent: 'center', alignItems: 'center',
-      padding: '0 32px', position: 'relative', zIndex: 1, textAlign: 'center',
-    }}>
-      <Link href="/create" style={{ textDecoration: 'none' }}>
-        <p style={{
-          fontFamily: "'Instrument Serif',serif",
-          fontSize: 30, fontStyle: 'italic',
-          color: 'rgba(240,235,225,0.28)', lineHeight: 1.3, marginBottom: 28,
-        }}>
-          No one has shared yet.<br />Start with yours.
-        </p>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '10px 24px',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: 4,
+    <motion.div
+      initial={{ opacity: 0, x: '30%' }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: '30%' }}
+      transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 100,
+        backgroundColor: 'rgb(4,6,16)',
+        overflowY: 'scroll',
+        scrollSnapType: 'y mandatory',
+      }}
+    >
+      {/* Atmospheric glow */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          top: '-10%', left: '50%',
+          transform: 'translateX(-50%)',
+          width: '110vw', height: '65vh',
+          borderRadius: '50%',
+          backgroundColor: glowColor,
+          opacity: activeCategory ? 0.13 : 0,
+          filter: 'blur(110px)',
+          transition: 'background-color 0.75s ease, opacity 0.6s ease',
+          pointerEvents: 'none', zIndex: 0,
+          willChange: 'background-color',
+        }}
+      />
+
+      {/* Back button — fixed top right */}
+      <button
+        type="button"
+        onClick={onBack}
+        style={{
+          position: 'fixed', top: 52, right: 20, zIndex: 110,
+          background: 'rgba(4,6,16,0.75)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.09)',
+          borderRadius: 999,
+          padding: '9px 16px',
           fontFamily: "'Space Mono',monospace",
-          fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase',
-          color: 'rgba(240,235,225,0.35)',
-        }}>
-          ✦&nbsp;&nbsp;share something
-        </div>
-      </Link>
-    </section>
+          fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
+          color: 'rgba(240,235,225,0.45)',
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: 8,
+          minHeight: 44,
+        }}
+      >
+        ✕
+      </button>
+
+      {/* Picks */}
+      {picks.map((pick, i) => (
+        <PickSection
+          key={pick.id}
+          pick={pick} capsule={capsule} author={author}
+          index={i} total={picks.length}
+          isFirstInCapsule={i === 0}
+          onFocus={setActiveCategory}
+        />
+      ))}
+    </motion.div>
   )
 }
 
-// ─── Past row ────────────────────────────────────────
-function PastCapsuleRow({ capsule, index }: { capsule: Capsule; index: number }) {
+// ─── Inbox capsule row ────────────────────────────────────────────────────────
+function CapsuleRow({ capsule, author, isUnread, isSelf, index, onOpen }: {
+  capsule: Capsule; author: User; isUnread: boolean; isSelf: boolean
+  index: number; onOpen: () => void
+}) {
+  const primaryColor = getCategoryColor(capsule.picks[0]?.category ?? 'Other')
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onOpen}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.07, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      whileTap={{ scale: 0.985 }}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+        padding: '17px 0',
+        background: 'none', border: 'none',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        cursor: 'pointer', textAlign: 'left',
+        position: 'relative',
+      }}
+    >
+      {/* Avatar + unread dot */}
+      <div style={{ position: 'relative', flexShrink: 0 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={author.avatar} alt={author.name}
+          style={{
+            width: 42, height: 42, borderRadius: '50%',
+            border: `1.5px solid ${isUnread ? primaryColor + '55' : 'rgba(255,255,255,0.06)'}`,
+            boxShadow: isUnread ? `0 0 18px ${primaryColor}22` : 'none',
+            opacity: isUnread ? 0.95 : 0.38,
+            transition: 'opacity 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease',
+          }}
+        />
+        {isUnread && (
+          <div style={{
+            position: 'absolute', top: -1, right: -1,
+            width: 9, height: 9, borderRadius: '50%',
+            backgroundColor: primaryColor,
+            border: '2px solid rgb(4,6,16)',
+            boxShadow: `0 0 10px ${primaryColor}cc`,
+          }} />
+        )}
+      </div>
+
+      {/* Name + picks preview */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{
+          fontFamily: "'Instrument Serif',serif",
+          fontSize: 19,
+          color: isUnread ? '#F0EBE1' : 'rgba(240,235,225,0.32)',
+          lineHeight: 1.0, marginBottom: 7,
+          transition: 'color 0.4s ease',
+        }}>
+          {isSelf ? 'Your capsule' : author.name}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          {capsule.picks.map(p => (
+            <div key={p.id} style={{
+              width: 5, height: 5, borderRadius: '50%',
+              backgroundColor: getCategoryColor(p.category),
+              opacity: isUnread ? 0.72 : 0.22,
+            }} />
+          ))}
+          <span style={{
+            fontFamily: "'Space Mono',monospace",
+            fontSize: 8, letterSpacing: '0.1em', textTransform: 'uppercase',
+            color: isUnread ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
+            marginLeft: 4,
+          }}>
+            {capsule.picks.length} pick{capsule.picks.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+
+      {/* Chevron */}
+      <svg viewBox="0 0 16 16" width={12} height={12} fill="none" style={{ flexShrink: 0 }}>
+        <path
+          d="M6 3l5 5-5 5"
+          stroke={isUnread ? `${primaryColor}70` : 'rgba(255,255,255,0.1)'}
+          strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+        />
+      </svg>
+    </motion.button>
+  )
+}
+
+// ─── Past week row (archive section) ─────────────────────────────────────────
+function PastRow({ capsule, author, index }: { capsule: Capsule; author: User; index: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -8 }}
+      initial={{ opacity: 0, x: -6 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: index * 0.05, duration: 0.4 }}
+      transition={{ delay: index * 0.05, duration: 0.38 }}
     >
       <Link href={`/capsule/${capsule.id}`} style={{ textDecoration: 'none', display: 'block' }}>
         <div style={{
           padding: '12px 0 12px 14px',
-          borderLeft: '2px solid rgba(255,255,255,0.07)',
+          borderLeft: '2px solid rgba(255,255,255,0.06)',
           display: 'flex', alignItems: 'center', gap: 14,
-          transition: 'border-color 0.2s',
         }}>
           <span style={{
             fontFamily: "'Space Mono',monospace", fontSize: 8,
             letterSpacing: '0.1em', textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.2)', flexShrink: 0, minWidth: 56,
+            color: 'rgba(255,255,255,0.18)', flexShrink: 0, minWidth: 48,
           }}>
             {formatWeekShort(capsule.weekStartDate)}
           </span>
           <span style={{
             fontFamily: "'Instrument Serif',serif", fontSize: 14,
-            color: 'rgba(240,235,225,0.48)', flex: 1,
+            color: 'rgba(240,235,225,0.4)', flex: 1,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {capsule.picks[0]?.title}
           </span>
-          <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
             {capsule.picks.map(p => (
               <div key={p.id} style={{
                 width: 5, height: 5, borderRadius: '50%',
-                background: getCategoryColor(p.category), opacity: 0.55,
+                backgroundColor: getCategoryColor(p.category), opacity: 0.5,
               }} />
             ))}
           </div>
@@ -293,121 +469,241 @@ function PastCapsuleRow({ capsule, index }: { capsule: Capsule; index: number })
   )
 }
 
-// ─── Page ────────────────────────────────────────────
-export default function HomePage() {
-  const { currentUser, users, capsules, getUserById } = useStore()
+// ─── Empty state ──────────────────────────────────────────────────────────────
+function EmptyState() {
+  return (
+    <div style={{ padding: '48px 0 32px', textAlign: 'center' }}>
+      <Link href="/create" style={{ textDecoration: 'none' }}>
+        <p style={{
+          fontFamily: "'Instrument Serif',serif",
+          fontSize: 22, fontStyle: 'italic',
+          color: 'rgba(240,235,225,0.2)', lineHeight: 1.45, marginBottom: 24,
+        }}>
+          Your orbit is quiet.<br />Start with yours.
+        </p>
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          padding: '10px 24px',
+          border: '1px solid rgba(255,255,255,0.09)', borderRadius: 4,
+          fontFamily: "'Space Mono',monospace",
+          fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase',
+          color: 'rgba(240,235,225,0.28)',
+        }}>
+          ✦&nbsp;&nbsp;share something
+        </div>
+      </Link>
+    </div>
+  )
+}
 
-  const feedCapsules = capsules
+// ─── Page ─────────────────────────────────────────────────────────────────────
+export default function HomePage() {
+  const { currentUser, users, capsules, getUserById, isFollowing } = useStore()
+  const [openedIds, setOpenedIds] = useState<Set<string>>(new Set())
+  const [viewingCapsuleId, setViewingCapsuleId] = useState<string | null>(null)
+
+  const thisWeek = getWeekStartDate()
+
+  const allGroups = capsules
     .filter(c => c.status === 'published')
+    .filter(c => c.userId === currentUser.id || isFollowing(c.userId))
     .sort((a, b) => {
-      const recency = (Date.parse(b.publishedAt ?? b.weekStartDate) - Date.parse(a.publishedAt ?? a.weekStartDate))
+      const recency = Date.parse(b.publishedAt ?? b.weekStartDate) - Date.parse(a.publishedAt ?? a.weekStartDate)
       if (recency !== 0) return recency
       const aTrust = getUserById(a.userId)?.relationshipStrength ?? 0
       const bTrust = getUserById(b.userId)?.relationshipStrength ?? 0
       return bTrust - aTrust
     })
+    .map(capsule => ({
+      capsule,
+      author: getUserById(capsule.userId) ?? users[0],
+    }))
 
-  const pastCapsules = capsules
-    .filter(c => c.status === 'published')
-    .sort((a, b) => b.weekStartDate.localeCompare(a.weekStartDate))
+  const thisWeekGroups = allGroups.filter(g => g.capsule.weekStartDate === thisWeek)
+  const pastGroups = allGroups
+    .filter(g => g.capsule.weekStartDate !== thisWeek && g.capsule.userId === currentUser.id)
     .slice(0, 6)
 
-  const feedItems = feedCapsules.flatMap(capsule => {
-    const author = getUserById(capsule.userId) ?? users[0]
-    return [...capsule.picks]
-      .sort((a, b) => a.order - b.order)
-      .map(pick => ({ pick, capsule, author }))
-  })
+  const unreadCount = thisWeekGroups.filter(g => !openedIds.has(g.capsule.id)).length
+  const caughtUp = thisWeekGroups.length > 0 && unreadCount === 0
+
+  const openCapsule = (id: string) => {
+    setOpenedIds(prev => new Set([...prev, id]))
+    setViewingCapsuleId(id)
+  }
+
+  const viewingGroup = viewingCapsuleId
+    ? allGroups.find(g => g.capsule.id === viewingCapsuleId)
+    : null
 
   return (
-    <div style={{
-      height: '100svh',
-      overflowY: 'scroll',
-      scrollSnapType: 'y mandatory',
-      background: 'linear-gradient(160deg,#0b0820 0%,#06091a 50%,#03060e 100%)',
-      position: 'relative',
-    }}>
-      {/* Fixed cosmic background */}
-      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        <StarField />
-        <PolarGrid />
-      </div>
+    <>
+      {/* Subtle ambient glow on inbox when there are unread capsules */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          top: '-10%', left: '50%',
+          transform: 'translateX(-50%)',
+          width: '80vw', height: '55vh',
+          borderRadius: '50%',
+          backgroundColor: '#C8A882',
+          opacity: unreadCount > 0 ? 0.055 : 0,
+          filter: 'blur(100px)',
+          transition: 'opacity 0.8s ease',
+          pointerEvents: 'none', zIndex: 0,
+        }}
+      />
 
-      {/* Top bar + scroll hint */}
+      {/* Fixed header */}
       <div style={{
-        height: '100svh',
-        scrollSnapAlign: 'start',
-        position: 'relative', zIndex: 1,
-        display: 'flex', flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '56px 24px 48px',
-        maxWidth: 512, margin: '0 auto',
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 20,
+        background: 'linear-gradient(to bottom, rgba(4,6,16,0.97) 0%, rgba(4,6,16,0.8) 65%, transparent 100%)',
+        paddingTop: 52, paddingBottom: 28,
+        paddingLeft: 24, paddingRight: 24,
         pointerEvents: 'none',
       }}>
-        {/* Nav row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'auto' }}>
-          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.22)' }}>
+        <div style={{
+          maxWidth: 512, margin: '0 auto',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          pointerEvents: 'auto',
+        }}>
+          <span style={{
+            fontFamily: "'Space Mono',monospace",
+            fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.22)',
+          }}>
             orbit
           </span>
-          <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.18)' }}>
-            {formatWeekShort(getWeekStartDate())}
+          <span style={{
+            fontFamily: "'Space Mono',monospace",
+            fontSize: 9, letterSpacing: '0.12em',
+            color: 'rgba(255,255,255,0.16)',
+          }}>
+            {formatWeekShort(thisWeek)}
           </span>
-          <Link href="/profile" style={{ pointerEvents: 'auto' }}>
+          <Link href="/profile" style={{ display: 'block' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={currentUser.avatar} alt={currentUser.name}
-              style={{ width: 26, height: 26, borderRadius: '50%', opacity: 0.8 }} />
+            <img
+              src={currentUser.avatar} alt={currentUser.name}
+              style={{ width: 28, height: 28, borderRadius: '50%', opacity: 0.8, display: 'block' }}
+            />
           </Link>
         </div>
-
-        {/* Scroll hint */}
-        {feedItems.length > 0 && (
-          <div style={{ textAlign: 'center' }}>
-            <p style={{
-              fontFamily: "'Instrument Serif',serif",
-              fontSize: 18, fontStyle: 'italic',
-              color: 'rgba(240,235,225,0.22)',
-              marginBottom: 16, lineHeight: 1.4,
-            }}>
-              {feedItems.length} thing{feedItems.length !== 1 ? 's' : ''} from your orbit this week
-            </p>
-            <svg
-              viewBox="0 0 24 24" width={16} height={16} fill="none"
-              style={{ animation: 'orbitFadeUp 1.8s ease-in-out infinite alternate', opacity: 0.3 }}
-            >
-              <path d="M12 5v14M5 12l7 7 7-7" stroke="rgba(240,235,225,0.8)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-        )}
       </div>
 
-      {/* Trusted feed or empty state */}
-      {feedItems.length > 0
-        ? feedItems.map(({ pick, capsule, author }, i) => (
-            <PickSection key={pick.id} pick={pick} capsule={capsule} author={author} index={i} total={feedItems.length} />
-          ))
-        : <EmptyState />
-      }
+      {/* Inbox scroll container */}
+      <div style={{ minHeight: '100svh', paddingBottom: 100, position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: 512, margin: '0 auto', padding: '120px 24px 0' }}>
 
-      {/* Past weeks */}
-      {pastCapsules.length > 0 && (
-        <section style={{
-          scrollSnapAlign: 'start',
-          minHeight: 'calc(100svh - 80px)',
-          position: 'relative', zIndex: 1,
-          padding: '36px 24px 120px',
-          maxWidth: 512, margin: '0 auto',
-          width: '100%',
-        }}>
-          <div style={{ marginBottom: 22 }}>
-            <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>
-              past weeks
-            </span>
+          {/* "This week" heading + unread count */}
+          <div style={{
+            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+            marginBottom: 6,
+          }}>
+            <h1 style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: 34, fontStyle: 'italic',
+              color: '#F0EBE1', letterSpacing: '-0.01em', lineHeight: 1,
+            }}>
+              This week
+            </h1>
+            <AnimatePresence>
+              {unreadCount > 0 && (
+                <motion.span
+                  initial={{ opacity: 0, x: 6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 6 }}
+                  style={{
+                    fontFamily: "'Space Mono',monospace",
+                    fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase',
+                    color: '#C8A882',
+                    display: 'flex', alignItems: 'center', gap: 7,
+                  }}
+                >
+                  <div style={{
+                    width: 5, height: 5, borderRadius: '50%',
+                    backgroundColor: '#C8A882',
+                    boxShadow: '0 0 8px #C8A882bb',
+                  }} />
+                  {unreadCount} new
+                </motion.span>
+              )}
+            </AnimatePresence>
           </div>
-          {pastCapsules.map((c, i) => (
-            <PastCapsuleRow key={c.id} capsule={c} index={i} />
-          ))}
-        </section>
-      )}
-    </div>
+
+          {/* Divider */}
+          <div style={{
+            height: 1,
+            background: 'linear-gradient(to right, rgba(200,168,130,0.18), rgba(255,255,255,0.04), transparent)',
+            marginBottom: 4,
+          }} />
+
+          {/* This week's capsule rows */}
+          {thisWeekGroups.length > 0
+            ? thisWeekGroups.map(({ capsule, author }, i) => (
+                <CapsuleRow
+                  key={capsule.id}
+                  capsule={capsule} author={author}
+                  isUnread={!openedIds.has(capsule.id)}
+                  isSelf={capsule.userId === currentUser.id}
+                  index={i}
+                  onOpen={() => openCapsule(capsule.id)}
+                />
+              ))
+            : <EmptyState />
+          }
+
+          {/* Caught up state */}
+          <AnimatePresence>
+            {caughtUp && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ marginTop: 36, marginBottom: 8, textAlign: 'center' }}
+              >
+                <p style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 19, fontStyle: 'italic',
+                  color: 'rgba(240,235,225,0.2)', lineHeight: 1.4,
+                }}>
+                  You&rsquo;re caught up.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Past weeks — your own archive */}
+          {pastGroups.length > 0 && (
+            <div style={{ marginTop: caughtUp ? 48 : 56 }}>
+              <div style={{ marginBottom: 16 }}>
+                <span style={{
+                  fontFamily: "'Space Mono',monospace",
+                  fontSize: 8, letterSpacing: '0.16em', textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.16)',
+                }}>
+                  your past weeks
+                </span>
+              </div>
+              {pastGroups.map(({ capsule, author }, i) => (
+                <PastRow key={capsule.id} capsule={capsule} author={author} index={i} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Capsule viewer overlay */}
+      <AnimatePresence>
+        {viewingGroup && (
+          <CapsuleViewer
+            key={viewingGroup.capsule.id}
+            capsule={viewingGroup.capsule}
+            author={viewingGroup.author}
+            onBack={() => setViewingCapsuleId(null)}
+          />
+        )}
+      </AnimatePresence>
+    </>
   )
 }

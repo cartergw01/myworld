@@ -36,8 +36,8 @@ export const mockCapsules: Capsule[] = [
   {
     id: 'capsule_maya_apr21',
     userId: 'user_maya',
-    weekStartDate: '2026-04-21',
-    publishedAt: '2026-04-26T09:15:00Z',
+    weekStartDate: '2026-04-28',
+    publishedAt: '2026-04-30T09:15:00Z',
     status: 'published',
     picks: [
       {
@@ -64,8 +64,8 @@ export const mockCapsules: Capsule[] = [
   {
     id: 'capsule_jules_apr21',
     userId: 'user_jules',
-    weekStartDate: '2026-04-21',
-    publishedAt: '2026-04-25T18:40:00Z',
+    weekStartDate: '2026-04-28',
+    publishedAt: '2026-04-29T18:40:00Z',
     status: 'published',
     picks: [
       {

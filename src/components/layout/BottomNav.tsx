@@ -58,15 +58,24 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className="flex-1 flex flex-col items-center justify-center gap-1.5 py-3 transition-colors duration-200"
-              style={{ color: isActive ? 'rgba(240,235,225,0.85)' : 'rgba(255,255,255,0.22)' }}
+              className="relative flex-1 flex flex-col items-center justify-center gap-1.5 py-3 transition-colors duration-200"
+              style={{ color: isActive ? 'rgba(240,235,225,0.9)' : 'rgba(255,255,255,0.22)' }}
             >
+              {isActive && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  width: 20, height: 1,
+                  background: 'linear-gradient(to right, transparent, rgba(200,168,130,0.7), transparent)',
+                  borderRadius: 1,
+                }} />
+              )}
               {icon(isActive)}
               <span style={{
                 fontFamily: "'Space Mono',monospace",
                 fontSize: 8, letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: isActive ? 'rgba(240,235,225,0.6)' : 'rgba(255,255,255,0.18)',
+                color: isActive ? 'rgba(200,168,130,0.7)' : 'rgba(255,255,255,0.18)',
               }}>
                 {label}
               </span>
