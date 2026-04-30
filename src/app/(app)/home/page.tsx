@@ -239,22 +239,33 @@ function PickSection({
         </div>
       </div>
 
-      {/* Progress dots */}
+      {/* Progress indicator */}
       <div style={{
         position: 'absolute', bottom: 28, left: '50%',
         transform: 'translateX(-50%)',
-        display: 'flex', gap: 6, zIndex: 2,
-        alignItems: 'center',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, zIndex: 2,
       }}>
-        {Array.from({ length: total }).map((_, i) => (
-          <div key={i} style={{
-            width: i === index ? 20 : 4,
-            height: 4, borderRadius: 2,
-            backgroundColor: i === index ? color : 'rgba(255,255,255,0.12)',
-            boxShadow: i === index ? `0 0 10px ${color}80` : 'none',
-            transition: 'width 0.35s ease, background-color 0.35s ease',
-          }} />
-        ))}
+        {total > 1 && (
+          <span style={{
+            fontFamily: "'Space Mono',monospace",
+            fontSize: 8, letterSpacing: '0.14em',
+            color: `${color}99`,
+            whiteSpace: 'nowrap',
+          }}>
+            {index + 1}&nbsp;/&nbsp;{total}
+          </span>
+        )}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {Array.from({ length: total }).map((_, i) => (
+            <div key={i} style={{
+              width: i === index ? 20 : 4,
+              height: 4, borderRadius: 2,
+              backgroundColor: i === index ? color : 'rgba(255,255,255,0.12)',
+              boxShadow: i === index ? `0 0 10px ${color}80` : 'none',
+              transition: 'width 0.35s ease, background-color 0.35s ease',
+            }} />
+          ))}
+        </div>
       </div>
     </motion.section>
   )
@@ -353,11 +364,13 @@ function CapsuleRow({ capsule, author, isUnread, isSelf, index, onOpen }: {
       whileTap={{ scale: 0.985 }}
       style={{
         width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-        padding: '17px 0',
-        background: 'none', border: 'none',
-        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        padding: '14px 12px',
+        background: isUnread ? 'rgba(255,255,255,0.034)' : 'rgba(255,255,255,0.012)',
+        border: `1px solid ${isUnread ? `${primaryColor}28` : 'rgba(255,255,255,0.06)'}`,
+        borderRadius: 10,
         cursor: 'pointer', textAlign: 'left',
         position: 'relative',
+        marginBottom: 8,
       }}
     >
       {/* Avatar + unread dot */}
@@ -415,10 +428,10 @@ function CapsuleRow({ capsule, author, isUnread, isSelf, index, onOpen }: {
       </div>
 
       {/* Chevron */}
-      <svg viewBox="0 0 16 16" width={12} height={12} fill="none" style={{ flexShrink: 0 }}>
+      <svg viewBox="0 0 16 16" width={14} height={14} fill="none" style={{ flexShrink: 0 }}>
         <path
           d="M6 3l5 5-5 5"
-          stroke={isUnread ? `${primaryColor}70` : 'rgba(255,255,255,0.1)'}
+          stroke={isUnread ? `${primaryColor}cc` : 'rgba(255,255,255,0.22)'}
           strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
         />
       </svg>

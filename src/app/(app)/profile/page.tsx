@@ -307,34 +307,57 @@ function ProfileContent() {
             {thisWeekCapsule ? (
               <CapsuleArchiveRow capsule={thisWeekCapsule} index={0} />
             ) : thisWeekDraft ? (
-              <button type="button" onClick={() => openCreate(thisWeekDraft)} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}>
-                <div style={{
-                  padding: '12px 16px 12px 16px',
-                  borderLeft: '2px dashed rgba(200,168,130,0.3)',
+              <motion.button
+                type="button"
+                onClick={() => openCreate(thisWeekDraft)}
+                whileTap={{ scale: 0.985 }}
+                style={{
+                  width: '100%', cursor: 'pointer', textAlign: 'left',
+                  background: 'rgba(200,168,130,0.04)',
+                  border: '1px dashed rgba(200,168,130,0.28)',
+                  borderRadius: 10,
+                  padding: '14px 16px',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-                }}>
-                  <div>
-                    <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 18, color: '#F0EBE1', marginBottom: 4 }}>
-                      {thisWeekDraft.picks[0]?.title || 'Draft in progress'}
-                    </p>
-                    <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.72)' }}>
-                      {thisWeekDraft.picks.length} {thisWeekDraft.picks.length === 1 ? 'item' : 'items'} · draft
-                    </span>
-                  </div>
-                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.62)', flexShrink: 0 }}>
-                    continue →
+                }}
+              >
+                <div>
+                  <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 18, color: '#F0EBE1', marginBottom: 4 }}>
+                    {thisWeekDraft.picks[0]?.title || 'Draft in progress'}
+                  </p>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.72)' }}>
+                    {thisWeekDraft.picks.length} {thisWeekDraft.picks.length === 1 ? 'item' : 'items'} · draft
                   </span>
                 </div>
-              </button>
+                <svg viewBox="0 0 16 16" width={13} height={13} fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M6 3l5 5-5 5" stroke="rgba(200,168,130,0.6)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </motion.button>
             ) : isCurrentUser ? (
-              <button type="button" onClick={() => openCreate()} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '12px 0 12px 16px', borderLeft: '2px solid rgba(200,168,130,0.25)', textAlign: 'left' }}>
-                <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, color: '#F0EBE1', marginBottom: 6 }}>
-                  Share this week
-                </p>
-                <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.78)' }}>
-                  ✦ add something
-                </span>
-              </button>
+              <motion.button
+                type="button"
+                onClick={() => openCreate()}
+                whileTap={{ scale: 0.985 }}
+                style={{
+                  width: '100%', cursor: 'pointer', textAlign: 'left',
+                  background: 'rgba(200,168,130,0.05)',
+                  border: '1px solid rgba(200,168,130,0.22)',
+                  borderRadius: 10,
+                  padding: '18px 18px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                }}
+              >
+                <div>
+                  <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, color: '#F0EBE1', marginBottom: 6 }}>
+                    Share this week
+                  </p>
+                  <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(200,168,130,0.78)' }}>
+                    ✦ what stayed with you?
+                  </span>
+                </div>
+                <svg viewBox="0 0 16 16" width={14} height={14} fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M6 3l5 5-5 5" stroke="rgba(200,168,130,0.55)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </motion.button>
             ) : (
               <div style={{ padding: '12px 0 12px 16px', borderLeft: '2px solid rgba(255,255,255,0.06)' }}>
                 <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 18, fontStyle: 'italic', color: 'rgba(240,235,225,0.52)' }}>
