@@ -1,4 +1,18 @@
-import type { User, Capsule } from '@/types'
+import type { User, Capsule, Notification } from '@/types'
+
+function mondayOf(weeksAgo: number): string {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  d.setDate(diff - weeksAgo * 7)
+  return d.toISOString().split('T')[0]
+}
+
+function daysAgo(n: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - n)
+  return d.toISOString()
+}
 
 export const currentUser: User = {
   id: 'user_carter',
@@ -60,16 +74,17 @@ export const mockUsers: User[] = [
 ]
 
 export const mockCapsules: Capsule[] = [
+  // ── This week: people in your orbit ──────────────────────────────────────
   {
-    id: 'capsule_leo_apr28',
+    id: 'capsule_leo_w0',
     userId: 'user_leo',
-    weekStartDate: '2026-04-28',
-    publishedAt: '2026-04-30T07:42:00Z',
+    weekStartDate: mondayOf(0),
+    publishedAt: daysAgo(2),
     status: 'published',
     picks: [
       {
         id: 'pick_leo_1a',
-        capsuleId: 'capsule_leo_apr28',
+        capsuleId: 'capsule_leo_w0',
         category: 'Read',
         title: 'The Carry Trade Unwind',
         source: 'FT Alphaville',
@@ -78,7 +93,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_leo_1b',
-        capsuleId: 'capsule_leo_apr28',
+        capsuleId: 'capsule_leo_w0',
         category: 'Listen',
         title: 'Time (After Time)',
         source: 'Flying Lotus — Spotify',
@@ -87,7 +102,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_leo_1c',
-        capsuleId: 'capsule_leo_apr28',
+        capsuleId: 'capsule_leo_w0',
         category: 'Idea',
         title: 'Patience is a position',
         source: 'Personal note',
@@ -97,15 +112,15 @@ export const mockCapsules: Capsule[] = [
     ],
   },
   {
-    id: 'capsule_nia_apr28',
+    id: 'capsule_nia_w0',
     userId: 'user_nia',
-    weekStartDate: '2026-04-28',
-    publishedAt: '2026-04-29T21:15:00Z',
+    weekStartDate: mondayOf(0),
+    publishedAt: daysAgo(3),
     status: 'published',
     picks: [
       {
         id: 'pick_nia_1a',
-        capsuleId: 'capsule_nia_apr28',
+        capsuleId: 'capsule_nia_w0',
         category: 'Watch',
         title: 'Refik Anadol: Echoes of the Earth',
         source: 'MoMA, New York',
@@ -114,7 +129,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_nia_1b',
-        capsuleId: 'capsule_nia_apr28',
+        capsuleId: 'capsule_nia_w0',
         category: 'Read',
         title: 'On Not Being Seen',
         source: 'The New Inquiry',
@@ -123,7 +138,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_nia_1c',
-        capsuleId: 'capsule_nia_apr28',
+        capsuleId: 'capsule_nia_w0',
         category: 'Other',
         title: 'The Eras Tour visual archive',
         source: 'Internet',
@@ -133,15 +148,15 @@ export const mockCapsules: Capsule[] = [
     ],
   },
   {
-    id: 'capsule_priya_apr28',
+    id: 'capsule_priya_w0',
     userId: 'user_priya',
-    weekStartDate: '2026-04-28',
-    publishedAt: '2026-04-28T20:00:00Z',
+    weekStartDate: mondayOf(0),
+    publishedAt: daysAgo(4),
     status: 'published',
     picks: [
       {
         id: 'pick_priya_1a',
-        capsuleId: 'capsule_priya_apr28',
+        capsuleId: 'capsule_priya_w0',
         category: 'Read',
         title: 'Attention and Effort',
         source: 'Daniel Kahneman, 1973',
@@ -150,7 +165,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_priya_1b',
-        capsuleId: 'capsule_priya_apr28',
+        capsuleId: 'capsule_priya_w0',
         category: 'Listen',
         title: 'David Deutsch on the nature of explanation',
         source: 'Lex Fridman Podcast',
@@ -159,7 +174,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_priya_1c',
-        capsuleId: 'capsule_priya_apr28',
+        capsuleId: 'capsule_priya_w0',
         category: 'Idea',
         title: 'The map becomes the territory for experts',
         source: 'Personal note',
@@ -169,15 +184,15 @@ export const mockCapsules: Capsule[] = [
     ],
   },
   {
-    id: 'capsule_maya_apr21',
+    id: 'capsule_maya_w0',
     userId: 'user_maya',
-    weekStartDate: '2026-04-28',
-    publishedAt: '2026-04-30T09:15:00Z',
+    weekStartDate: mondayOf(0),
+    publishedAt: daysAgo(2),
     status: 'published',
     picks: [
       {
         id: 'pick_maya_1a',
-        capsuleId: 'capsule_maya_apr21',
+        capsuleId: 'capsule_maya_w0',
         category: 'Read',
         title: 'The Maintenance of Everything',
         source: 'Works in Progress',
@@ -187,7 +202,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_maya_1b',
-        capsuleId: 'capsule_maya_apr21',
+        capsuleId: 'capsule_maya_w0',
         category: 'Idea',
         title: 'Cities reveal their values in their defaults',
         source: 'Field note',
@@ -197,15 +212,15 @@ export const mockCapsules: Capsule[] = [
     ],
   },
   {
-    id: 'capsule_jules_apr21',
+    id: 'capsule_jules_w0',
     userId: 'user_jules',
-    weekStartDate: '2026-04-28',
-    publishedAt: '2026-04-29T18:40:00Z',
+    weekStartDate: mondayOf(0),
+    publishedAt: daysAgo(1),
     status: 'published',
     picks: [
       {
         id: 'pick_jules_1a',
-        capsuleId: 'capsule_jules_apr21',
+        capsuleId: 'capsule_jules_w0',
         category: 'Watch',
         title: 'Perfect Days',
         source: 'Wim Wenders',
@@ -214,7 +229,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_jules_1b',
-        capsuleId: 'capsule_jules_apr21',
+        capsuleId: 'capsule_jules_w0',
         category: 'Other',
         title: 'A website that only changes at midnight',
         source: 'Internet artifact',
@@ -223,16 +238,18 @@ export const mockCapsules: Capsule[] = [
       },
     ],
   },
+
+  // ── Carter's past weeks ───────────────────────────────────────────────────
   {
-    id: 'capsule_apr14',
+    id: 'capsule_w1',
     userId: 'user_carter',
-    weekStartDate: '2026-04-14',
-    publishedAt: '2026-04-19T18:32:00Z',
+    weekStartDate: mondayOf(1),
+    publishedAt: daysAgo(5),
     status: 'published',
     picks: [
       {
         id: 'pick_1a',
-        capsuleId: 'capsule_apr14',
+        capsuleId: 'capsule_w1',
         category: 'Read',
         title: 'Situational Awareness',
         source: 'Leopold Aschenbrenner',
@@ -243,29 +260,27 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_1b',
-        capsuleId: 'capsule_apr14',
+        capsuleId: 'capsule_w1',
         category: 'Watch',
         title: 'Sinners',
         source: 'Ryan Coogler / A24',
-        url: 'https://www.imdb.com/title/tt8041270/',
         thumbnail: 'https://picsum.photos/seed/pick1b/400/220',
         note: 'Did not expect a vampire horror film to be the best thing I\'ve seen this year. The blues scene is transcendent.',
         order: 1,
       },
       {
         id: 'pick_1c',
-        capsuleId: 'capsule_apr14',
+        capsuleId: 'capsule_w1',
         category: 'Listen',
         title: 'Manning Fireworks',
         source: 'MJ Lenderman — Spotify',
-        url: 'https://open.spotify.com/album/manning-fireworks',
         thumbnail: 'https://picsum.photos/seed/pick1c/400/220',
         note: 'Genuinely funny, genuinely sad. Guitar sounds like it\'s collapsing. On repeat since it dropped.',
         order: 2,
       },
       {
         id: 'pick_1d',
-        capsuleId: 'capsule_apr14',
+        capsuleId: 'capsule_w1',
         category: 'Idea',
         title: 'The best interfaces disappear',
         source: 'Personal note',
@@ -274,11 +289,10 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_1e',
-        capsuleId: 'capsule_apr14',
+        capsuleId: 'capsule_w1',
         category: 'Other',
         title: 'The Rabbit R1 postmortem nobody wrote',
         source: 'The Verge',
-        url: 'https://www.theverge.com',
         thumbnail: 'https://picsum.photos/seed/pick1e/400/220',
         note: 'Launched a year ago and nobody mentions it anymore. Useful reminder that being early to a category means nothing if the product doesn\'t work.',
         order: 4,
@@ -286,48 +300,45 @@ export const mockCapsules: Capsule[] = [
     ],
   },
   {
-    id: 'capsule_apr07',
+    id: 'capsule_w2',
     userId: 'user_carter',
-    weekStartDate: '2026-04-07',
-    publishedAt: '2026-04-12T20:14:00Z',
+    weekStartDate: mondayOf(2),
+    publishedAt: daysAgo(12),
     status: 'published',
     picks: [
       {
         id: 'pick_2a',
-        capsuleId: 'capsule_apr07',
+        capsuleId: 'capsule_w2',
         category: 'Read',
         title: 'Taste Is a Moat',
         source: 'The Diff — Substack',
-        url: 'https://thediff.co',
         thumbnail: 'https://picsum.photos/seed/pick2a/400/220',
         note: 'Aesthetic judgment compounds like capital. You can\'t fake it and you can\'t copy it quickly. Best thing I\'ve read on why taste matters in products.',
         order: 0,
       },
       {
         id: 'pick_2b',
-        capsuleId: 'capsule_apr07',
+        capsuleId: 'capsule_w2',
         category: 'Watch',
         title: 'Adolescence',
         source: 'Netflix',
-        url: 'https://www.netflix.com',
         thumbnail: 'https://picsum.photos/seed/pick2b/400/220',
         note: 'One continuous take per episode. The school episode is a masterclass in sustained dread. Uncomfortable in the best way.',
         order: 1,
       },
       {
         id: 'pick_2c',
-        capsuleId: 'capsule_apr07',
+        capsuleId: 'capsule_w2',
         category: 'Listen',
         title: 'Chromakopia',
         source: 'Tyler, the Creator — Spotify',
-        url: 'https://open.spotify.com',
         thumbnail: 'https://picsum.photos/seed/pick2c/400/220',
         note: 'Still sitting with this one. The production is doing things I can\'t explain. "Noid" and "Take Your Mask Off" back to back.',
         order: 2,
       },
       {
         id: 'pick_2d',
-        capsuleId: 'capsule_apr07',
+        capsuleId: 'capsule_w2',
         category: 'Idea',
         title: 'Products don\'t have features, they have opinions',
         source: 'Personal note',
@@ -337,26 +348,25 @@ export const mockCapsules: Capsule[] = [
     ],
   },
   {
-    id: 'capsule_mar31',
+    id: 'capsule_w3',
     userId: 'user_carter',
-    weekStartDate: '2026-03-31',
-    publishedAt: '2026-04-05T16:47:00Z',
+    weekStartDate: mondayOf(3),
+    publishedAt: daysAgo(19),
     status: 'published',
     picks: [
       {
         id: 'pick_3a',
-        capsuleId: 'capsule_mar31',
+        capsuleId: 'capsule_w3',
         category: 'Read',
         title: 'The Bitter Lesson',
         source: 'Rich Sutton',
-        url: 'http://www.incompleteideas.net/IncIdeas/BitterLesson.html',
         thumbnail: 'https://picsum.photos/seed/pick3a/400/220',
         note: 'Written in 2019 and still the most important thing about AI. Scale wins. We keep building elaborate systems that scale poorly and then act surprised.',
         order: 0,
       },
       {
         id: 'pick_3b',
-        capsuleId: 'capsule_mar31',
+        capsuleId: 'capsule_w3',
         category: 'Watch',
         title: 'Dune: Part Two — second watch',
         source: 'Denis Villeneuve',
@@ -366,18 +376,17 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_3c',
-        capsuleId: 'capsule_mar31',
+        capsuleId: 'capsule_w3',
         category: 'Listen',
         title: 'Short n\' Sweet',
         source: 'Sabrina Carpenter — Apple Music',
-        url: 'https://music.apple.com',
         thumbnail: 'https://picsum.photos/seed/pick3c/400/220',
         note: 'Embarrassingly good pop record. "Please Please Please" and "Espresso" are indestructible. Perfect summer songs.',
         order: 2,
       },
       {
         id: 'pick_3d',
-        capsuleId: 'capsule_mar31',
+        capsuleId: 'capsule_w3',
         category: 'Idea',
         title: 'Most products fail at the problem, not the solution',
         source: 'Personal note',
@@ -386,7 +395,7 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_3e',
-        capsuleId: 'capsule_mar31',
+        capsuleId: 'capsule_w3',
         category: 'Other',
         title: 'Every Noise at Once',
         source: 'Glenn McDonald / Spotify',
@@ -398,26 +407,25 @@ export const mockCapsules: Capsule[] = [
     ],
   },
   {
-    id: 'capsule_mar24',
+    id: 'capsule_w4',
     userId: 'user_carter',
-    weekStartDate: '2026-03-24',
-    publishedAt: '2026-03-28T21:05:00Z',
+    weekStartDate: mondayOf(4),
+    publishedAt: daysAgo(26),
     status: 'published',
     picks: [
       {
         id: 'pick_4a',
-        capsuleId: 'capsule_mar24',
+        capsuleId: 'capsule_w4',
         category: 'Read',
         title: 'How the NBA Became Unwatchable',
         source: 'The Atlantic',
-        url: 'https://theatlantic.com',
         thumbnail: 'https://picsum.photos/seed/pick4a/400/220',
         note: 'Sharp critique of pace-and-space optimization. The league maximized efficiency and in doing so removed the thing that made it interesting.',
         order: 0,
       },
       {
         id: 'pick_4b',
-        capsuleId: 'capsule_mar24',
+        capsuleId: 'capsule_w4',
         category: 'Watch',
         title: 'Thunder vs Suns — Game 4',
         source: 'ESPN',
@@ -427,18 +435,17 @@ export const mockCapsules: Capsule[] = [
       },
       {
         id: 'pick_4c',
-        capsuleId: 'capsule_mar24',
+        capsuleId: 'capsule_w4',
         category: 'Listen',
         title: 'GNX',
         source: 'Kendrick Lamar — Spotify',
-        url: 'https://open.spotify.com',
         thumbnail: 'https://picsum.photos/seed/pick4c/400/220',
         note: 'The closer is perfect. "Gloria" ends the album exactly how it needed to. The whole thing sounds like LA in a specific way.',
         order: 2,
       },
       {
         id: 'pick_4d',
-        capsuleId: 'capsule_mar24',
+        capsuleId: 'capsule_w4',
         category: 'Idea',
         title: 'Attention is the only currency that compounds',
         source: 'Personal note',
@@ -446,5 +453,35 @@ export const mockCapsules: Capsule[] = [
         order: 3,
       },
     ],
+  },
+]
+
+export const mockNotifications: Notification[] = [
+  {
+    id: 'notif_1',
+    type: 'resonate',
+    fromUserId: 'user_jules',
+    pickId: 'pick_2d',
+    capsuleId: 'capsule_w2',
+    pickTitle: 'Products don\'t have features, they have opinions',
+    createdAt: daysAgo(1),
+  },
+  {
+    id: 'notif_2',
+    type: 'resonate',
+    fromUserId: 'user_maya',
+    pickId: 'pick_1a',
+    capsuleId: 'capsule_w1',
+    pickTitle: 'Situational Awareness',
+    createdAt: daysAgo(3),
+  },
+  {
+    id: 'notif_3',
+    type: 'resonate',
+    fromUserId: 'user_leo',
+    pickId: 'pick_1d',
+    capsuleId: 'capsule_w1',
+    pickTitle: 'The best interfaces disappear',
+    createdAt: daysAgo(4),
   },
 ]

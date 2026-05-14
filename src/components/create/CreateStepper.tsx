@@ -36,6 +36,7 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [publishing, setPublishing] = useState(false)
+  const [published, setPublished] = useState(false)
   const [draftSaved, setDraftSaved] = useState(false)
   const [isEditing, setIsEditing] = useState(!!initialCapsule)
 
@@ -116,13 +117,64 @@ export function CreateStepper({ initialCapsule, onDone }: CreateStepperProps) {
     } else {
       addCapsule(capsule)
     }
-    setTimeout(() => { if (onDone) onDone(); else router.push('/home') }, 650)
+    setTimeout(() => setPublished(true), 600)
+    setTimeout(() => { if (onDone) onDone(); else router.push('/home') }, 3200)
   }
 
   const activePick = picks[activeIndex] ?? picks[0]
   const selectedColor = activePick.category ? getCategoryColor(activePick.category) : '#C8A882'
   const completed = picks.filter(p => p.category && p.title?.trim() && p.note?.trim()).length
   const readyToPublish = picks.length > 0 && completed === picks.length
+
+  if (published) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 200,
+          backgroundColor: 'rgb(4,6,16)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          textAlign: 'center', padding: '0 32px',
+        }}
+      >
+        <div style={{
+          position: 'absolute', top: '30%', left: '50%',
+          transform: 'translate(-50%,-50%)',
+          width: '70vw', height: '70vw', maxWidth: 420, maxHeight: 420,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(200,168,130,0.18) 0%, transparent 70%)',
+          filter: 'blur(40px)',
+          pointerEvents: 'none',
+        }} />
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            fontFamily: "'Instrument Serif',serif",
+            fontSize: 42, fontStyle: 'italic', lineHeight: 1.1,
+            color: '#F0EBE1', marginBottom: 20, letterSpacing: '-0.02em',
+          }}
+        >
+          Out there.
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          style={{
+            fontFamily: "'Space Mono',monospace",
+            fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase',
+            color: 'rgba(200,168,130,0.65)',
+          }}
+        >
+          {picks.length} {picks.length === 1 ? 'pick' : 'picks'} shared with your orbit
+        </motion.p>
+      </motion.div>
+    )
+  }
 
   return (
     <div

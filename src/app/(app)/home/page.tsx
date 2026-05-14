@@ -511,8 +511,7 @@ function EmptyState() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const { currentUser, users, capsules, getUserById, isFollowing } = useStore()
-  const [openedIds, setOpenedIds] = useState<Set<string>>(new Set())
+  const { currentUser, users, capsules, getUserById, isFollowing, openedCapsuleIds, markCapsuleOpened } = useStore()
   const [viewingCapsuleId, setViewingCapsuleId] = useState<string | null>(null)
 
   const thisWeek = getWeekStartDate()
@@ -537,11 +536,11 @@ export default function HomePage() {
     .filter(g => g.capsule.weekStartDate !== thisWeek && g.capsule.userId === currentUser.id)
     .slice(0, 6)
 
-  const unreadCount = thisWeekGroups.filter(g => !openedIds.has(g.capsule.id)).length
+  const unreadCount = thisWeekGroups.filter(g => !openedCapsuleIds.has(g.capsule.id)).length
   const caughtUp = thisWeekGroups.length > 0 && unreadCount === 0
 
   const openCapsule = (id: string) => {
-    setOpenedIds(prev => new Set([...prev, id]))
+    markCapsuleOpened(id)
     setViewingCapsuleId(id)
   }
 
@@ -658,7 +657,7 @@ export default function HomePage() {
                 <CapsuleRow
                   key={capsule.id}
                   capsule={capsule} author={author}
-                  isUnread={!openedIds.has(capsule.id)}
+                  isUnread={!openedCapsuleIds.has(capsule.id)}
                   isSelf={capsule.userId === currentUser.id}
                   index={i}
                   onOpen={() => openCapsule(capsule.id)}

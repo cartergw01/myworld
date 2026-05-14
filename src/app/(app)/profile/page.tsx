@@ -8,7 +8,7 @@ import { useStore } from '@/lib/store'
 import { formatWeekLabel, formatWeekShort, getCategoryColor, getWeekStartDate } from '@/lib/utils'
 import { CategoryGlyph } from '@/components/capsule/CategoryGlyph'
 import { CreateStepper } from '@/components/create/CreateStepper'
-import type { Capsule, Category, Pick } from '@/types'
+import type { Capsule, Category, Notification, Pick, User } from '@/types'
 
 function CapsuleArchiveRow({ capsule, index }: { capsule: Capsule; index: number }) {
   return (
@@ -121,8 +121,56 @@ function TypeDistributionBar({ capsules }: { capsules: Capsule[] }) {
   )
 }
 
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const d = Math.floor(diff / 86400000)
+  if (d === 0) return 'today'
+  if (d === 1) return 'yesterday'
+  return `${d}d ago`
+}
+
+function ActivitySection({ notifications, getUserById }: {
+  notifications: Notification[]
+  getUserById: (id: string) => User | undefined
+}) {
+  if (notifications.length === 0) return null
+  return (
+    <div style={{ marginTop: 32 }}>
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 20 }} />
+      <div style={{ marginBottom: 12 }}>
+        <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.36)' }}>
+          activity
+        </span>
+      </div>
+      {notifications.slice(0, 5).map(n => {
+        const from = getUserById(n.fromUserId)
+        if (!from) return null
+        return (
+          <div key={n.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={from.avatar} alt={from.name} style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0, opacity: 0.82 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: "'Instrument Serif',serif", fontSize: 14, color: 'rgba(240,235,225,0.72)', lineHeight: 1.45 }}>
+                <span style={{ color: '#F0EBE1' }}>{from.name}</span>
+                {n.type === 'resonate' ? ' resonated with ' : ' published '}
+                {n.pickTitle && (
+                  <span style={{ fontStyle: 'italic' }}>&ldquo;{n.pickTitle}&rdquo;</span>
+                )}
+              </p>
+              <span style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.30)' }}>
+                {timeAgo(n.createdAt)}
+              </span>
+            </div>
+            <span style={{ color: 'rgba(123,179,255,0.55)', fontSize: 12, flexShrink: 0, paddingTop: 1 }}>✦</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function ProfileContent() {
-  const { currentUser, capsules, savedItems, getUserById, isFollowing, follow, unfollow } = useStore()
+  const { currentUser, capsules, savedItems, notifications, getUserById, isFollowing, follow, unfollow } = useStore()
   const searchParams = useSearchParams()
 
   const activeTab = searchParams.get('tab') === 'archive'
@@ -388,6 +436,10 @@ function ProfileContent() {
                   </Link>
                 )}
               </>
+            )}
+
+            {isCurrentUser && (
+              <ActivitySection notifications={notifications} getUserById={getUserById} />
             )}
           </>
         )}

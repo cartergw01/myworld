@@ -37,3 +37,13 @@ export interface SavedItem {
   pickId: string
   savedAt: string
 }
+
+export interface Notification {
+  id: string
+  type: 'resonate' | 'publish'
+  fromUserId: string
+  pickId?: string
+  capsuleId?: string
+  pickTitle?: string
+  createdAt: string
+}

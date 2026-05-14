@@ -1,8 +1,8 @@
 'use client'
 
-import { createContext, useContext, useState, type ReactNode } from 'react'
-import type { Capsule, User, SavedItem } from '@/types'
-import { currentUser as seedUser, mockCapsules as seedCapsules, mockUsers as seedUsers } from '@/data/mock'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import type { Capsule, Notification, User, SavedItem } from '@/types'
+import { currentUser as seedUser, mockCapsules as seedCapsules, mockUsers as seedUsers, mockNotifications as seedNotifications } from '@/data/mock'
 
 interface StoreContextValue {
   currentUser: User
@@ -11,6 +11,8 @@ interface StoreContextValue {
   savedItems: SavedItem[]
   following: string[]
   resonated: ReadonlySet<string>
+  notifications: Notification[]
+  openedCapsuleIds: ReadonlySet<string>
   addCapsule: (capsule: Capsule) => void
   updateCapsule: (capsule: Capsule) => void
   getCapsuleById: (id: string) => Capsule | undefined
@@ -24,22 +26,64 @@ interface StoreContextValue {
   resonate: (pickId: string) => void
   unresonate: (pickId: string) => void
   isResonated: (pickId: string) => boolean
+  markCapsuleOpened: (capsuleId: string) => void
+  addNotification: (n: Notification) => void
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null)
 
+function loadStorage<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback
+  try {
+    const v = localStorage.getItem(key)
+    return v !== null ? (JSON.parse(v) as T) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+function saveStorage<T>(key: string, value: T): void {
+  if (typeof window === 'undefined') return
+  try { localStorage.setItem(key, JSON.stringify(value)) } catch {}
+}
+
+const DEFAULT_FOLLOWING = ['user_maya', 'user_jules', 'user_leo', 'user_nia', 'user_priya']
+
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [capsules, setCapsules] = useState<Capsule[]>(seedCapsules)
-  const [savedItems, setSavedItems] = useState<SavedItem[]>([])
-  const [following, setFollowing] = useState<string[]>(['user_maya', 'user_jules', 'user_leo', 'user_nia', 'user_priya'])
-  const [resonated, setResonated] = useState<ReadonlySet<string>>(new Set())
+  const [userCapsules, setUserCapsules] = useState<Capsule[]>(() =>
+    loadStorage('mw_userCapsules', [])
+  )
+  const [savedItems, setSavedItems] = useState<SavedItem[]>(() =>
+    loadStorage('mw_savedItems', [])
+  )
+  const [following, setFollowing] = useState<string[]>(() =>
+    loadStorage('mw_following', DEFAULT_FOLLOWING)
+  )
+  const [resonated, setResonated] = useState<ReadonlySet<string>>(() =>
+    new Set(loadStorage<string[]>('mw_resonated', []))
+  )
+  const [openedCapsuleIds, setOpenedCapsuleIds] = useState<ReadonlySet<string>>(() =>
+    new Set(loadStorage<string[]>('mw_openedIds', []))
+  )
+  const [notifications, setNotifications] = useState<Notification[]>(() =>
+    loadStorage('mw_notifications', seedNotifications)
+  )
+
+  useEffect(() => { saveStorage('mw_userCapsules', userCapsules) }, [userCapsules])
+  useEffect(() => { saveStorage('mw_savedItems', savedItems) }, [savedItems])
+  useEffect(() => { saveStorage('mw_following', following) }, [following])
+  useEffect(() => { saveStorage('mw_resonated', [...resonated]) }, [resonated])
+  useEffect(() => { saveStorage('mw_openedIds', [...openedCapsuleIds]) }, [openedCapsuleIds])
+  useEffect(() => { saveStorage('mw_notifications', notifications) }, [notifications])
+
+  const capsules = [...seedCapsules, ...userCapsules]
 
   const addCapsule = (capsule: Capsule) => {
-    setCapsules(prev => [capsule, ...prev])
+    setUserCapsules(prev => [capsule, ...prev.filter(c => c.id !== capsule.id)])
   }
 
   const updateCapsule = (updated: Capsule) => {
-    setCapsules(prev => prev.map(c => c.id === updated.id ? updated : c))
+    setUserCapsules(prev => prev.map(c => c.id === updated.id ? updated : c))
   }
 
   const getCapsuleById = (id: string) => capsules.find(c => c.id === id)
@@ -84,6 +128,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const isResonated = (pickId: string) => resonated.has(pickId)
 
+  const markCapsuleOpened = (capsuleId: string) => {
+    setOpenedCapsuleIds(prev => new Set([...prev, capsuleId]))
+  }
+
+  const addNotification = (n: Notification) => {
+    setNotifications(prev => [n, ...prev])
+  }
+
   return (
     <StoreContext.Provider value={{
       currentUser: seedUser,
@@ -92,6 +144,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       savedItems,
       following,
       resonated,
+      notifications,
+      openedCapsuleIds,
       addCapsule,
       updateCapsule,
       getCapsuleById,
@@ -105,6 +159,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       resonate,
       unresonate,
       isResonated,
+      markCapsuleOpened,
+      addNotification,
     }}>
       {children}
     </StoreContext.Provider>
